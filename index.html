@@ -3,420 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inventory Management System</title>
+<title>InvenTrack - Inventory Management System</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <style>
-:root {
-  --sidebar-width: 260px;
-  --primary: #4361ee;
-  --primary-dark: #3a56d4;
-  --secondary: #6c757d;
-  --success: #2ec4b6;
-  --danger: #e63946;
-  --warning: #f77f00;
-  --dark: #1a1a2e;
-  --darker: #16162a;
-  --light-bg: #f0f2f5;
-  --card-bg: #ffffff;
-  --text-primary: #1a1a2e;
-  --text-secondary: #6c757d;
-  --border-color: #e0e0e0;
-}
+:root{--sidebar-width:260px;--primary:#4361ee;--primary-dark:#3a56d4;--success:#2ec4b6;--danger:#e63946;--warning:#f77f00;--dark:#1a1a2e;--darker:#16162a;--light-bg:#f0f2f5;--card-bg:#fff;--text-primary:#1a1a2e;--text-secondary:#6c757d;--border-color:#e0e0e0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--light-bg);color:var(--text-primary);min-height:100vh}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-width);height:100vh;background:linear-gradient(180deg,var(--dark),var(--darker));color:#fff;z-index:1000;transition:transform .3s;overflow-y:auto}
+.sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
+.sidebar-brand .logo{width:42px;height:42px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+.sidebar-brand h5{margin:0;font-size:16px;font-weight:600}
+.sidebar-brand small{color:rgba(255,255,255,.5);font-size:11px}
+.sidebar-nav{padding:16px 0}
+.nav-section{padding:8px 20px 6px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);font-weight:600}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;color:rgba(255,255,255,.65);transition:all .2s;border-left:3px solid transparent;text-decoration:none;font-size:14px}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-item.active{background:rgba(67,97,238,.15);color:#fff;border-left-color:var(--primary)}
+.nav-item i{font-size:18px;width:22px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
 
-body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: var(--light-bg);
-  color: var(--text-primary);
-  min-height: 100vh;
-}
+.main-content{margin-left:var(--sidebar-width);min-height:100vh;transition:margin-left .3s}
+.top-header{background:var(--card-bg);padding:16px 30px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.top-header h4{margin:0;font-weight:700;font-size:20px}
+.role-badge{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.role-badge.admin{background:#e8f5e9;color:#2e7d32}
+.role-badge.staff{background:#fff3e0;color:#e65100}
+.menu-toggle{display:none;background:0 0;border:none;font-size:24px;cursor:pointer;color:var(--text-primary)}
+.page-content{padding:24px 30px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
 
-/* Sidebar */
-.sidebar {
-  position: fixed; top: 0; left: 0;
-  width: var(--sidebar-width); height: 100vh;
-  background: linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%);
-  color: #fff; z-index: 1000;
-  transition: transform 0.3s ease;
-  overflow-y: auto;
-}
+.stat-card{background:var(--card-bg);border-radius:14px;padding:22px;border:1px solid var(--border-color);transition:transform .2s,box-shadow .2s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.08)}
+.stat-card .icon-box{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.stat-card .stat-value{font-size:28px;font-weight:700;margin:8px 0 2px;line-height:1}
+.stat-card .stat-label{color:var(--text-secondary);font-size:13px}
 
-.sidebar-brand {
-  padding: 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  display: flex; align-items: center; gap: 12px;
-}
+.content-card{background:var(--card-bg);border-radius:14px;border:1px solid var(--border-color);margin-bottom:24px}
+.content-card .card-header{padding:18px 22px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:0 0}
+.content-card .card-header h6{margin:0;font-weight:700;font-size:16px}
+.content-card .card-body{padding:22px}
 
-.sidebar-brand .logo {
-  width: 42px; height: 42px;
-  background: var(--primary);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; font-weight: 700;
-}
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table thead th{background:#f8f9fa;padding:12px 16px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-secondary);border-bottom:2px solid var(--border-color);white-space:nowrap}
+.data-table tbody td{padding:12px 16px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.data-table tbody tr:hover{background:#f8f9fb}
+.data-table tbody tr:last-child td{border-bottom:none}
 
-.sidebar-brand h5 { margin: 0; font-size: 16px; font-weight: 600; }
-.sidebar-brand small { color: rgba(255,255,255,0.5); font-size: 11px; }
+.badge-in{background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-out{background:#fce4ec;color:#c62828;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-low{background:#fff3e0;color:#e65100;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-ok{background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
 
-.sidebar-nav { padding: 16px 0; }
+.btn-primary{background:var(--primary);border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+.btn-icon{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border-color);background:#fff;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.btn-icon:hover{background:#f8f9fa;color:var(--text-primary)}
+.btn-icon.danger:hover{background:#fce4ec;color:var(--danger);border-color:var(--danger)}
+.btn-icon.success:hover{background:#e8f5e9;color:#2e7d32;border-color:#2e7d32}
 
-.nav-section {
-  padding: 8px 20px 6px;
-  font-size: 10px; text-transform: uppercase;
-  letter-spacing: 1.5px; color: rgba(255,255,255,0.35);
-  font-weight: 600;
-}
+.form-control,.form-select{border-radius:10px;border:1px solid var(--border-color);padding:10px 14px;font-size:14px}
+.form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,.15)}
+.form-label{font-weight:600;font-size:13px;margin-bottom:6px;color:var(--text-primary)}
 
-.nav-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 20px; cursor: pointer;
-  color: rgba(255,255,255,0.65);
-  transition: all 0.2s; border-left: 3px solid transparent;
-  text-decoration: none; font-size: 14px;
-}
+.modal-content{border-radius:16px;border:none}
+.modal-header{border-bottom:1px solid var(--border-color);padding:20px 24px}
+.modal-body{padding:24px}
+.modal-footer{border-top:1px solid var(--border-color);padding:16px 24px}
+.modal-title{font-weight:700}
 
-.nav-item:hover {
-  background: rgba(255,255,255,0.05);
-  color: #fff;
-}
+.search-box{position:relative}
+.search-box input{padding-left:40px;border-radius:10px}
+.search-box i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-secondary)}
 
-.nav-item.active {
-  background: rgba(67,97,238,0.15);
-  color: #fff;
-  border-left-color: var(--primary);
-}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}
+.empty-state i{font-size:60px;opacity:.3}
+.empty-state h5{margin-top:16px;color:var(--text-primary)}
 
-.nav-item i { font-size: 18px; width: 22px; text-align: center; }
+.link-display{background:#f8f9fa;border:1px dashed var(--border-color);border-radius:10px;padding:12px 16px;font-family:monospace;font-size:13px;word-break:break-all}
 
-.nav-badge {
-  margin-left: auto;
-  background: var(--danger);
-  color: #fff; font-size: 10px; font-weight: 600;
-  padding: 2px 7px; border-radius: 10px;
-}
+/* Sync bar */
+.sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#ccc}
+.sync-dot.online{background:#4caf50;box-shadow:0 0 6px #4caf50}
+.sync-dot.loading{background:#ff9800;animation:pulse 1s infinite}
+.sync-dot.error{background:#f44336}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Main Content */
-.main-content {
-  margin-left: var(--sidebar-width);
-  min-height: 100vh;
-  transition: margin-left 0.3s ease;
-}
+/* Loading overlay */
+.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.spinner-ring{width:50px;height:50px;border:4px solid #e0e0e0;border-top:4px solid var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay p{margin-top:16px;color:var(--text-secondary);font-size:14px}
 
-/* Top Header */
-.top-header {
-  background: var(--card-bg);
-  padding: 16px 30px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-}
+/* Setup screen */
+.setup-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2);z-index:10000;display:flex;align-items:center;justify-content:center}
+.setup-screen.hidden{display:none}
+.setup-card{background:#fff;border-radius:20px;padding:40px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.setup-card h2{font-weight:700;margin-bottom:6px}
+.setup-card .subtitle{color:var(--text-secondary);margin-bottom:24px;font-size:14px}
+.setup-steps{background:#f8f9fa;border-radius:12px;padding:16px 20px;margin-bottom:20px;font-size:13px;line-height:1.8}
+.setup-steps ol{padding-left:18px;margin:0}
+.setup-error{color:var(--danger);font-size:13px;margin-top:8px;display:none}
+.setup-success{color:#2e7d32;font-size:13px;margin-top:8px;display:none}
 
-.top-header h4 { margin: 0; font-weight: 700; font-size: 20px; }
-
-.role-badge {
-  padding: 5px 14px; border-radius: 20px;
-  font-size: 12px; font-weight: 600;
-}
-
-.role-badge.admin { background: #e8f5e9; color: #2e7d32; }
-.role-badge.staff { background: #fff3e0; color: #e65100; }
-
-.menu-toggle {
-  display: none;
-  background: none; border: none;
-  font-size: 24px; cursor: pointer;
-  color: var(--text-primary);
-}
-
-/* Page Content */
-.page-content { padding: 24px 30px; }
-.page { display: none; }
-.page.active { display: block; }
-
-/* Stat Cards */
-.stat-card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  padding: 22px;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-
-.stat-card .icon-box {
-  width: 48px; height: 48px;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-}
-
-.stat-card .stat-value {
-  font-size: 28px; font-weight: 700;
-  margin: 8px 0 2px; line-height: 1;
-}
-
-.stat-card .stat-label {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-/* Cards */
-.content-card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
-  margin-bottom: 24px;
-}
-
-.content-card .card-header {
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex; align-items: center; justify-content: space-between;
-  background: transparent;
-}
-
-.content-card .card-header h6 {
-  margin: 0; font-weight: 700; font-size: 16px;
-}
-
-.content-card .card-body { padding: 22px; }
-
-/* Tables */
-.table-responsive { overflow-x: auto; }
-
-.data-table {
-  width: 100%; border-collapse: collapse;
-  font-size: 14px;
-}
-
-.data-table thead th {
-  background: #f8f9fa;
-  padding: 12px 16px;
-  font-weight: 600; font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary);
-  border-bottom: 2px solid var(--border-color);
-  white-space: nowrap;
-}
-
-.data-table tbody td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  vertical-align: middle;
-}
-
-.data-table tbody tr:hover { background: #f8f9fb; }
-
-.data-table tbody tr:last-child td { border-bottom: none; }
-
-/* Badges */
-.badge-in {
-  background: #e8f5e9; color: #2e7d32;
-  padding: 4px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600;
-}
-
-.badge-out {
-  background: #fce4ec; color: #c62828;
-  padding: 4px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600;
-}
-
-.badge-low {
-  background: #fff3e0; color: #e65100;
-  padding: 4px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600;
-}
-
-.badge-ok {
-  background: #e8f5e9; color: #2e7d32;
-  padding: 4px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600;
-}
-
-/* Buttons */
-.btn-primary {
-  background: var(--primary); border-color: var(--primary);
-}
-.btn-primary:hover {
-  background: var(--primary-dark); border-color: var(--primary-dark);
-}
-
-.btn-icon {
-  width: 34px; height: 34px;
-  padding: 0; display: inline-flex;
-  align-items: center; justify-content: center;
-  border-radius: 8px; border: 1px solid var(--border-color);
-  background: #fff; color: var(--text-secondary);
-  cursor: pointer; transition: all 0.2s;
-}
-
-.btn-icon:hover { background: #f8f9fa; color: var(--text-primary); }
-.btn-icon.danger:hover { background: #fce4ec; color: var(--danger); border-color: var(--danger); }
-.btn-icon.success:hover { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
-
-/* Forms */
-.form-control, .form-select {
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  padding: 10px 14px;
-  font-size: 14px;
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(67,97,238,0.15);
-}
-
-.form-label {
-  font-weight: 600; font-size: 13px;
-  margin-bottom: 6px; color: var(--text-primary);
-}
-
-/* Modal */
-.modal-content { border-radius: 16px; border: none; }
-.modal-header {
-  border-bottom: 1px solid var(--border-color);
-  padding: 20px 24px;
-}
-.modal-body { padding: 24px; }
-.modal-footer {
-  border-top: 1px solid var(--border-color);
-  padding: 16px 24px;
-}
-.modal-title { font-weight: 700; }
-
-/* Search */
-.search-box {
-  position: relative;
-}
-
-.search-box input {
-  padding-left: 40px;
-  border-radius: 10px;
-}
-
-.search-box i {
-  position: absolute; left: 14px; top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-secondary);
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center; padding: 60px 20px;
-  color: var(--text-secondary);
-}
-
-.empty-state i { font-size: 60px; opacity: 0.3; }
-.empty-state h5 { margin-top: 16px; color: var(--text-primary); }
-.empty-state p { font-size: 14px; }
-
-/* Link Copy */
-.link-display {
-  background: #f8f9fa;
-  border: 1px dashed var(--border-color);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-family: monospace;
-  font-size: 13px;
-  word-break: break-all;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.show { transform: translateX(0); }
-  .main-content { margin-left: 0; }
-  .menu-toggle { display: block; }
-  .page-content { padding: 16px; }
-  .top-header { padding: 12px 16px; }
-  .stat-card .stat-value { font-size: 22px; }
-}
-
-/* Overlay */
-.sidebar-overlay {
-  display: none; position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
-}
-
-.sidebar-overlay.show { display: block; }
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.page.active { animation: fadeIn 0.3s ease; }
-
-/* Cost display */
-.cost-highlight {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff; border-radius: 14px;
-  padding: 24px;
-}
-
-.cost-highlight .value { font-size: 32px; font-weight: 700; }
-.cost-highlight .label { opacity: 0.8; font-size: 13px; }
-
-/* Print styles */
-@media print {
-  .sidebar, .top-header, .no-print { display: none !important; }
-  .main-content { margin-left: 0 !important; }
-}
+/* Button loading */
+.btn-loading{position:relative;pointer-events:none;opacity:.7}
+.btn-loading::after{content:'';position:absolute;width:16px;height:16px;border:2px solid transparent;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;right:12px;top:50%;margin-top:-8px}
 
 /* Toast */
-.toast-container {
-  position: fixed; top: 20px; right: 20px;
-  z-index: 9999;
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999}
+.custom-toast{background:var(--card-bg);border-radius:12px;padding:14px 20px;margin-bottom:10px;box-shadow:0 10px 40px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;min-width:280px;border-left:4px solid var(--primary)}
+.custom-toast.success{border-left-color:var(--success)}
+.custom-toast.error{border-left-color:var(--danger)}
+.custom-toast.warning{border-left-color:var(--warning)}
+@keyframes slideIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:999}
+.sidebar-overlay.show{display:block}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.show{transform:translateX(0)}
+  .main-content{margin-left:0}
+  .menu-toggle{display:block}
+  .page-content{padding:16px}
+  .top-header{padding:12px 16px}
+  .stat-card .stat-value{font-size:22px}
 }
-
-.custom-toast {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 14px 20px;
-  margin-bottom: 10px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-  display: flex; align-items: center; gap: 10px;
-  animation: slideIn 0.3s ease;
-  min-width: 280px;
-  border-left: 4px solid var(--primary);
-}
-
-.custom-toast.success { border-left-color: var(--success); }
-.custom-toast.error { border-left-color: var(--danger); }
-.custom-toast.warning { border-left-color: var(--warning); }
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(100px); }
-  to { opacity: 1; transform: translateX(0); }
+@media print{
+  .sidebar,.top-header,.no-print{display:none!important}
+  .main-content{margin-left:0!important}
 }
 </style>
 </head>
 <body>
 
-<!-- Sidebar Overlay (Mobile) -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<!-- ==================== SETUP SCREEN ==================== -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-card">
+    <div style="text-align:center;margin-bottom:20px;font-size:50px;">📦</div>
+    <h2 style="text-align:center;">InvenTrack Setup</h2>
+    <p class="subtitle" style="text-align:center;">Connect to Google Sheets to sync data across devices</p>
+    <div class="setup-steps">
+      <strong>Quick Setup:</strong>
+      <ol>
+        <li>Create a Google Sheet</li>
+        <li>Add the Apps Script code (see instructions)</li>
+        <li>Deploy as Web App → copy the URL</li>
+        <li>Paste the URL below</li>
+      </ol>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Google Apps Script Web App URL</label>
+      <input type="url" class="form-control" id="setupApiUrl"
+             placeholder="https://script.google.com/macros/s/xxx/exec">
+    </div>
+    <button class="btn btn-primary w-100 py-2" id="setupConnectBtn" onclick="testAndConnect()">
+      <i class="bi bi-plug me-2"></i>Test Connection & Connect
+    </button>
+    <div class="setup-error" id="setupError"></div>
+    <div class="setup-success" id="setupSuccess"></div>
+    <hr style="margin:20px 0">
+    <p class="text-center text-muted" style="font-size:12px;">
+      Data will be stored in your Google Sheet and synced in real-time between admin & staff.
+    </p>
+  </div>
+</div>
 
-<!-- Sidebar -->
+<!-- ==================== LOADING OVERLAY ==================== -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner-ring"></div>
+  <p id="loadingText">Connecting to Google Sheets...</p>
+</div>
+
+<!-- ==================== SIDEBAR ==================== -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="logo">📦</div>
-    <div>
-      <h5>InvenTrack</h5>
-      <small>Inventory System v1.0</small>
-    </div>
+    <div><h5>InvenTrack</h5><small>Google Sheets Edition</small></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Main</div>
@@ -427,7 +198,6 @@ body {
       <i class="bi bi-box-seam-fill"></i> Products
       <span class="nav-badge" id="productCount">0</span>
     </a>
-
     <div class="nav-section">Operations</div>
     <a class="nav-item" data-page="stockin" onclick="showPage('stockin')">
       <i class="bi bi-plus-circle-fill"></i> Stock In
@@ -435,200 +205,121 @@ body {
     <a class="nav-item" data-page="stockout" onclick="showPage('stockout')">
       <i class="bi bi-dash-circle-fill"></i> Stock Out
     </a>
-
-    <div class="nav-section" id="adminSection1">Reports</div>
+    <div class="nav-section admin-only">Reports</div>
     <a class="nav-item admin-only" data-page="transactions" onclick="showPage('transactions')">
       <i class="bi bi-clock-history"></i> Transactions
     </a>
     <a class="nav-item admin-only" data-page="export" onclick="showPage('export')">
       <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
     </a>
-
-    <div class="nav-section admin-only" id="adminSection2">Admin</div>
+    <div class="nav-section admin-only">Admin</div>
     <a class="nav-item admin-only" data-page="settings" onclick="showPage('settings')">
       <i class="bi bi-gear-fill"></i> Settings
     </a>
   </nav>
 </aside>
 
-<!-- Main Content -->
+<!-- ==================== MAIN CONTENT ==================== -->
 <div class="main-content">
-  <!-- Top Header -->
   <header class="top-header">
     <div style="display:flex;align-items:center;gap:12px;">
-      <button class="menu-toggle" onclick="toggleSidebar()">
-        <i class="bi bi-list"></i>
-      </button>
+      <button class="menu-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
       <h4 id="pageTitle">Dashboard</h4>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
-      <span class="role-badge admin" id="roleBadge">
-        <i class="bi bi-shield-check"></i> Admin
-      </span>
+      <div class="sync-bar">
+        <div class="sync-dot" id="syncDot"></div>
+        <span id="syncText">Connecting...</span>
+        <button class="btn btn-sm btn-outline-secondary" style="padding:2px 8px;font-size:11px;" onclick="refreshData()" title="Refresh data">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <span class="role-badge admin" id="roleBadge"><i class="bi bi-shield-check"></i> Admin</span>
     </div>
   </header>
 
   <div class="page-content">
 
-    <!-- ==================== DASHBOARD PAGE ==================== -->
+    <!-- ========== DASHBOARD ========== -->
     <div class="page active" id="page-dashboard">
-      <!-- Stat Cards -->
       <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
           <div class="stat-card">
-            <div class="icon-box" style="background:#eef2ff;color:var(--primary);">
-              <i class="bi bi-box-seam-fill"></i>
-            </div>
+            <div class="icon-box" style="background:#eef2ff;color:var(--primary);"><i class="bi bi-box-seam-fill"></i></div>
             <div class="stat-value" id="statProducts">0</div>
             <div class="stat-label">Total Products</div>
           </div>
         </div>
         <div class="col-6 col-lg-3">
           <div class="stat-card">
-            <div class="icon-box" style="background:#e8f5e9;color:#2e7d32;">
-              <i class="bi bi-stack"></i>
-            </div>
+            <div class="icon-box" style="background:#e8f5e9;color:#2e7d32;"><i class="bi bi-stack"></i></div>
             <div class="stat-value" id="statTotalQty">0</div>
             <div class="stat-label">Total Quantity</div>
           </div>
         </div>
         <div class="col-6 col-lg-3">
           <div class="stat-card">
-            <div class="icon-box" style="background:#fff3e0;color:#e65100;">
-              <i class="bi bi-cash-stack"></i>
-            </div>
+            <div class="icon-box" style="background:#fff3e0;color:#e65100;"><i class="bi bi-cash-stack"></i></div>
             <div class="stat-value" id="statTotalValue">$0</div>
             <div class="stat-label">Total Value</div>
           </div>
         </div>
         <div class="col-6 col-lg-3">
           <div class="stat-card">
-            <div class="icon-box" style="background:#fce4ec;color:#c62828;">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-            </div>
+            <div class="icon-box" style="background:#fce4ec;color:#c62828;"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div class="stat-value" id="statLowStock">0</div>
             <div class="stat-label">Low Stock Items</div>
           </div>
         </div>
       </div>
-
       <div class="row g-4">
-        <!-- Low Stock Alerts -->
         <div class="col-lg-6">
           <div class="content-card">
-            <div class="card-header">
-              <h6><i class="bi bi-exclamation-triangle text-warning me-2"></i>Low Stock Alerts</h6>
-            </div>
-            <div class="card-body" id="lowStockList">
-              <div class="empty-state" style="padding:30px;">
-                <i class="bi bi-check-circle"></i>
-                <p class="mt-2 mb-0">All stock levels are healthy</p>
-              </div>
-            </div>
+            <div class="card-header"><h6><i class="bi bi-exclamation-triangle text-warning me-2"></i>Low Stock Alerts</h6></div>
+            <div class="card-body" id="lowStockList"><div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All stock levels are healthy</p></div></div>
           </div>
         </div>
-
-        <!-- Recent Transactions -->
         <div class="col-lg-6">
           <div class="content-card">
-            <div class="card-header">
-              <h6><i class="bi bi-clock-history text-primary me-2"></i>Recent Transactions</h6>
-            </div>
+            <div class="card-header"><h6><i class="bi bi-clock-history text-primary me-2"></i>Recent Transactions</h6></div>
             <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead><tr>
-                    <th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Cost</th>
-                  </tr></thead>
-                  <tbody id="recentTransBody">
-                    <tr><td colspan="5" class="text-center text-muted py-4">No transactions yet</td></tr>
-                  </tbody>
-                </table>
-              </div>
+              <div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Cost</th></tr></thead><tbody id="recentTransBody"><tr><td colspan="5" class="text-center text-muted py-4">No transactions yet</td></tr></tbody></table></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== PRODUCTS PAGE ==================== -->
+    <!-- ========== PRODUCTS ========== -->
     <div class="page" id="page-products">
       <div class="content-card">
         <div class="card-header">
-          <div class="search-box" style="width:300px;">
-            <i class="bi bi-search"></i>
-            <input type="text" class="form-control" placeholder="Search products..." 
-                   id="productSearch" oninput="renderProducts()">
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="openProductModal()">
-            <i class="bi bi-plus-lg me-1"></i> Add Product
-          </button>
+          <div class="search-box" style="width:300px;"><i class="bi bi-search"></i><input type="text" class="form-control" placeholder="Search products..." id="productSearch" oninput="renderProducts()"></div>
+          <button class="btn btn-primary btn-sm" id="addProductBtn" onclick="openProductModal()"><i class="bi bi-plus-lg me-1"></i> Add Product</button>
         </div>
         <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead><tr>
-                <th>SKU</th>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th>Quantity</th>
-                <th>Avg Cost</th>
-                <th>Total Value</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr></thead>
-              <tbody id="productsTableBody">
-              </tbody>
-            </table>
-          </div>
+          <div class="table-responsive"><table class="data-table"><thead><tr><th>SKU</th><th>Product Name</th><th>Category</th><th>Quantity</th><th>Avg Cost</th><th>Total Value</th><th>Status</th><th>Actions</th></tr></thead><tbody id="productsTableBody"></tbody></table></div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== STOCK IN PAGE ==================== -->
+    <!-- ========== STOCK IN ========== -->
     <div class="page" id="page-stockin">
       <div class="row g-4">
         <div class="col-lg-7">
           <div class="content-card">
-            <div class="card-header">
-              <h6><i class="bi bi-plus-circle text-success me-2"></i>Stock In Entry</h6>
-            </div>
+            <div class="card-header"><h6><i class="bi bi-plus-circle text-success me-2"></i>Stock In Entry</h6></div>
             <div class="card-body">
               <form id="stockInForm" onsubmit="processStockIn(event)">
-                <div class="mb-3">
-                  <label class="form-label">Product *</label>
-                  <select class="form-select" id="siProduct" required onchange="updateStockInInfo()">
-                    <option value="">-- Select Product --</option>
-                  </select>
-                </div>
+                <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="siProduct" required onchange="updateStockInInfo()"><option value="">-- Select Product --</option></select></div>
                 <div class="row g-3 mb-3">
-                  <div class="col-6">
-                    <label class="form-label">Quantity *</label>
-                    <input type="number" class="form-control" id="siQuantity" min="1" required
-                           oninput="calcStockInTotal()">
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label">Unit Cost ($) *</label>
-                    <input type="number" class="form-control" id="siUnitCost" min="0" step="0.01" required
-                           oninput="calcStockInTotal()">
-                  </div>
+                  <div class="col-6"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="siQuantity" min="1" required oninput="calcStockInTotal()"></div>
+                  <div class="col-6"><label class="form-label">Unit Cost ($) *</label><input type="number" class="form-control" id="siUnitCost" min="0" step="0.01" required oninput="calcStockInTotal()"></div>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label">Total Cost</label>
-                  <input type="text" class="form-control" id="siTotalCost" readonly 
-                         style="background:#f8f9fa;font-weight:700;font-size:18px;">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Date</label>
-                  <input type="date" class="form-control" id="siDate">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Supplier / Notes</label>
-                  <input type="text" class="form-control" id="siNotes" placeholder="Optional notes...">
-                </div>
-                <button type="submit" class="btn btn-success w-100 py-2">
-                  <i class="bi bi-plus-circle me-2"></i>Confirm Stock In
-                </button>
+                <div class="mb-3"><label class="form-label">Total Cost</label><input type="text" class="form-control" id="siTotalCost" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
+                <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="siDate"></div>
+                <div class="mb-3"><label class="form-label">Supplier / Notes</label><input type="text" class="form-control" id="siNotes" placeholder="Optional notes..."></div>
+                <button type="submit" class="btn btn-success w-100 py-2" id="btnStockIn"><i class="bi bi-plus-circle me-2"></i>Confirm Stock In</button>
               </form>
             </div>
           </div>
@@ -636,54 +327,26 @@ body {
         <div class="col-lg-5">
           <div class="content-card">
             <div class="card-header"><h6>Current Stock Info</h6></div>
-            <div class="card-body" id="siInfoPanel">
-              <div class="text-center text-muted py-4">
-                <i class="bi bi-info-circle" style="font-size:40px;opacity:0.3;"></i>
-                <p class="mt-2">Select a product to see current info</p>
-              </div>
-            </div>
+            <div class="card-body" id="siInfoPanel"><div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product to see current info</p></div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== STOCK OUT PAGE ==================== -->
+    <!-- ========== STOCK OUT ========== -->
     <div class="page" id="page-stockout">
       <div class="row g-4">
         <div class="col-lg-7">
           <div class="content-card">
-            <div class="card-header">
-              <h6><i class="bi bi-dash-circle text-danger me-2"></i>Stock Out Entry</h6>
-            </div>
+            <div class="card-header"><h6><i class="bi bi-dash-circle text-danger me-2"></i>Stock Out Entry</h6></div>
             <div class="card-body">
               <form id="stockOutForm" onsubmit="processStockOut(event)">
-                <div class="mb-3">
-                  <label class="form-label">Product *</label>
-                  <select class="form-select" id="soProduct" required onchange="updateStockOutInfo()">
-                    <option value="">-- Select Product --</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Quantity *</label>
-                  <input type="number" class="form-control" id="soQuantity" min="1" required
-                         oninput="calcStockOutTotal()">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Cost Out (based on Avg Cost)</label>
-                  <input type="text" class="form-control" id="soTotalCost" readonly
-                         style="background:#f8f9fa;font-weight:700;font-size:18px;">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Date</label>
-                  <input type="date" class="form-control" id="soDate">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Reason / Notes</label>
-                  <input type="text" class="form-control" id="soNotes" placeholder="e.g. Sold, Damaged, etc.">
-                </div>
-                <button type="submit" class="btn btn-danger w-100 py-2">
-                  <i class="bi bi-dash-circle me-2"></i>Confirm Stock Out
-                </button>
+                <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="soProduct" required onchange="updateStockOutInfo()"><option value="">-- Select Product --</option></select></div>
+                <div class="mb-3"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="soQuantity" min="1" required oninput="calcStockOutTotal()"></div>
+                <div class="mb-3"><label class="form-label">Cost Out (based on Avg Cost)</label><input type="text" class="form-control" id="soTotalCost" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
+                <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="soDate"></div>
+                <div class="mb-3"><label class="form-label">Reason / Notes</label><input type="text" class="form-control" id="soNotes" placeholder="e.g. Sold, Damaged, etc."></div>
+                <button type="submit" class="btn btn-danger w-100 py-2" id="btnStockOut"><i class="bi bi-dash-circle me-2"></i>Confirm Stock Out</button>
               </form>
             </div>
           </div>
@@ -691,170 +354,134 @@ body {
         <div class="col-lg-5">
           <div class="content-card">
             <div class="card-header"><h6>Current Stock Info</h6></div>
-            <div class="card-body" id="soInfoPanel">
-              <div class="text-center text-muted py-4">
-                <i class="bi bi-info-circle" style="font-size:40px;opacity:0.3;"></i>
-                <p class="mt-2">Select a product to see current info</p>
-              </div>
-            </div>
+            <div class="card-body" id="soInfoPanel"><div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product to see current info</p></div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== TRANSACTIONS PAGE ==================== -->
+    <!-- ========== TRANSACTIONS ========== -->
     <div class="page" id="page-transactions">
       <div class="content-card">
         <div class="card-header" style="flex-wrap:wrap;gap:10px;">
           <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Transaction History</h6>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <select class="form-select form-select-sm" style="width:140px;" id="txFilterType"
-                    onchange="renderTransactions()">
-              <option value="">All Types</option>
-              <option value="IN">Stock In</option>
-              <option value="OUT">Stock Out</option>
-            </select>
-            <select class="form-select form-select-sm" style="width:180px;" id="txFilterProduct"
-                    onchange="renderTransactions()">
-              <option value="">All Products</option>
-            </select>
-            <input type="date" class="form-control form-control-sm" style="width:150px;"
-                   id="txFilterFrom" onchange="renderTransactions()" placeholder="From">
-            <input type="date" class="form-control form-control-sm" style="width:150px;"
-                   id="txFilterTo" onchange="renderTransactions()" placeholder="To">
-            <button class="btn btn-outline-secondary btn-sm" onclick="clearTxFilters()">
-              <i class="bi bi-x-circle"></i> Clear
-            </button>
+            <select class="form-select form-select-sm" style="width:140px;" id="txFilterType" onchange="renderTransactions()"><option value="">All Types</option><option value="IN">Stock In</option><option value="OUT">Stock Out</option></select>
+            <select class="form-select form-select-sm" style="width:180px;" id="txFilterProduct" onchange="renderTransactions()"><option value="">All Products</option></select>
+            <input type="date" class="form-control form-control-sm" style="width:150px;" id="txFilterFrom" onchange="renderTransactions()">
+            <input type="date" class="form-control form-control-sm" style="width:150px;" id="txFilterTo" onchange="renderTransactions()">
+            <button class="btn btn-outline-secondary btn-sm" onclick="clearTxFilters()"><i class="bi bi-x-circle"></i> Clear</button>
           </div>
         </div>
         <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead><tr>
-                <th>#</th><th>Date</th><th>Product</th><th>Type</th>
-                <th>Qty</th><th>Unit Cost</th><th>Total Cost</th>
-                <th>Avg Cost After</th><th>Notes</th><th>By</th>
-              </tr></thead>
-              <tbody id="transactionsTableBody">
-              </tbody>
-            </table>
-          </div>
+          <div class="table-responsive"><table class="data-table"><thead><tr><th>#</th><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Unit Cost</th><th>Total Cost</th><th>Avg Cost After</th><th>Notes</th><th>By</th></tr></thead><tbody id="transactionsTableBody"></tbody></table></div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== EXPORT PAGE ==================== -->
+    <!-- ========== EXPORT ========== -->
     <div class="page" id="page-export">
       <div class="row g-4">
         <div class="col-lg-4">
-          <div class="content-card">
-            <div class="card-body text-center py-5">
-              <i class="bi bi-file-earmark-spreadsheet" style="font-size:50px;color:var(--success);"></i>
-              <h5 class="mt-3">Products List</h5>
-              <p class="text-muted small">Export all products with current stock levels and average costs</p>
-              <button class="btn btn-success" onclick="exportProducts()">
-                <i class="bi bi-download me-2"></i>Export Products
-              </button>
-            </div>
-          </div>
+          <div class="content-card"><div class="card-body text-center py-5">
+            <i class="bi bi-file-earmark-spreadsheet" style="font-size:50px;color:var(--success);"></i>
+            <h5 class="mt-3">Products List</h5>
+            <p class="text-muted small">Export all products with stock levels and average costs</p>
+            <button class="btn btn-success" onclick="exportProducts()"><i class="bi bi-download me-2"></i>Export Products</button>
+          </div></div>
         </div>
         <div class="col-lg-4">
-          <div class="content-card">
-            <div class="card-body text-center py-5">
-              <i class="bi bi-file-earmark-bar-graph" style="font-size:50px;color:var(--primary);"></i>
-              <h5 class="mt-3">Transactions</h5>
-              <p class="text-muted small">Export all transaction history with costs and details</p>
-              <button class="btn btn-primary" onclick="exportTransactions()">
-                <i class="bi bi-download me-2"></i>Export Transactions
-              </button>
-            </div>
-          </div>
+          <div class="content-card"><div class="card-body text-center py-5">
+            <i class="bi bi-file-earmark-bar-graph" style="font-size:50px;color:var(--primary);"></i>
+            <h5 class="mt-3">Transactions</h5>
+            <p class="text-muted small">Export all transaction history with costs</p>
+            <button class="btn btn-primary" onclick="exportTransactions()"><i class="bi bi-download me-2"></i>Export Transactions</button>
+          </div></div>
         </div>
         <div class="col-lg-4">
-          <div class="content-card">
-            <div class="card-body text-center py-5">
-              <i class="bi bi-file-earmark-ruled" style="font-size:50px;color:var(--warning);"></i>
-              <h5 class="mt-3">Full Report</h5>
-              <p class="text-muted small">Export complete report with products & transactions in one file</p>
-              <button class="btn btn-warning text-white" onclick="exportFullReport()">
-                <i class="bi bi-download me-2"></i>Export Full Report
-              </button>
-            </div>
-          </div>
+          <div class="content-card"><div class="card-body text-center py-5">
+            <i class="bi bi-file-earmark-ruled" style="font-size:50px;color:var(--warning);"></i>
+            <h5 class="mt-3">Full Report</h5>
+            <p class="text-muted small">Summary + Products + Transactions in one file</p>
+            <button class="btn btn-warning text-white" onclick="exportFullReport()"><i class="bi bi-download me-2"></i>Export Full Report</button>
+          </div></div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== SETTINGS PAGE ==================== -->
+    <!-- ========== SETTINGS ========== -->
     <div class="page" id="page-settings">
       <div class="row g-4">
+        <!-- Connection -->
+        <div class="col-lg-6">
+          <div class="content-card">
+            <div class="card-header"><h6><i class="bi bi-plug me-2"></i>Google Sheets Connection</h6></div>
+            <div class="card-body">
+              <p class="text-muted small">Currently connected to:</p>
+              <div class="link-display mb-3" id="currentApiUrl" style="font-size:11px;"></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm" onclick="changeApiUrl()"><i class="bi bi-pencil me-1"></i>Change URL</button>
+                <button class="btn btn-outline-success btn-sm" onclick="testCurrentConnection()"><i class="bi bi-check-circle me-1"></i>Test Connection</button>
+              </div>
+              <hr>
+              <p class="text-muted small mb-2"><i class="bi bi-google me-1"></i>Open Google Sheet:</p>
+              <a href="#" id="sheetLink" target="_blank" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Open Spreadsheet
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff Link -->
         <div class="col-lg-6">
           <div class="content-card">
             <div class="card-header"><h6><i class="bi bi-link-45deg me-2"></i>Staff Link</h6></div>
             <div class="card-body">
-              <p class="text-muted small">Share this link with your staff so they can update stock (Stock In / Stock Out only):</p>
-              <div class="link-display mb-3" id="staffLink"></div>
-              <button class="btn btn-primary btn-sm" onclick="copyStaffLink()">
-                <i class="bi bi-clipboard me-1"></i> Copy Link
-              </button>
-              <div class="mt-3 small text-muted">
-                <i class="bi bi-info-circle me-1"></i>
-                Staff can only see Stock In and Stock Out pages. They cannot view dashboard, reports, or export data.
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-database me-2"></i>Data Management</h6></div>
-            <div class="card-body">
-              <p class="text-muted small mb-3">Manage your inventory data. Data is stored in your browser's localStorage.</p>
-              <div class="d-flex gap-2 flex-wrap">
-                <button class="btn btn-outline-primary btn-sm" onclick="exportBackup()">
-                  <i class="bi bi-cloud-download me-1"></i> Backup Data
-                </button>
-                <button class="btn btn-outline-success btn-sm" onclick="document.getElementById('importFile').click()">
-                  <i class="bi bi-cloud-upload me-1"></i> Restore Data
-                </button>
-                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
-                <button class="btn btn-outline-danger btn-sm" onclick="clearAllData()">
-                  <i class="bi bi-trash me-1"></i> Clear All Data
-                </button>
-              </div>
-              <hr>
-              <h6 class="small fw-bold">Demo Data</h6>
-              <button class="btn btn-outline-secondary btn-sm" onclick="loadDemoData()">
-                <i class="bi bi-magic me-1"></i> Load Sample Data
-              </button>
+              <p class="text-muted small">Share this link. Staff can only Stock In / Stock Out:</p>
+              <div class="link-display mb-3" id="staffLink" style="font-size:11px;"></div>
+              <button class="btn btn-primary btn-sm" onclick="copyStaffLink()"><i class="bi bi-clipboard me-1"></i>Copy Link</button>
             </div>
           </div>
         </div>
 
-        <!-- Multi-user note -->
-        <div class="col-12">
+        <!-- Data Management -->
+        <div class="col-lg-6">
           <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-cloud me-2"></i>Multi-User / Cloud Sync (Advanced)</h6></div>
+            <div class="card-header"><h6><i class="bi bi-database me-2"></i>Data Management</h6></div>
             <div class="card-body">
-              <div class="alert alert-info mb-0 small">
-                <i class="bi bi-info-circle me-1"></i>
-                <strong>Note:</strong> Currently, data is stored locally in your browser (localStorage). 
-                For real-time multi-user sync (admin + staff on different devices), you can integrate with:
-                <ul class="mt-2 mb-0">
-                  <li><strong>Firebase Realtime Database</strong> - Free tier available, easy to set up</li>
-                  <li><strong>Google Sheets API</strong> - Use Google Sheets as a backend</li>
-                  <li><strong>Supabase</strong> - Open source Firebase alternative</li>
-                </ul>
+              <p class="text-muted small mb-3">Data is stored in Google Sheets. These actions modify the sheet directly.</p>
+              <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-secondary btn-sm" onclick="apiLoadDemo()"><i class="bi bi-magic me-1"></i>Load Demo Data</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="apiClearAll()"><i class="bi bi-trash me-1"></i>Clear All Data</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto Refresh -->
+        <div class="col-lg-6">
+          <div class="content-card">
+            <div class="card-header"><h6><i class="bi bi-arrow-repeat me-2"></i>Auto Refresh</h6></div>
+            <div class="card-body">
+              <p class="text-muted small mb-3">Auto-refresh interval to sync data from Google Sheets:</p>
+              <select class="form-select form-select-sm" style="width:200px;" id="refreshInterval" onchange="setRefreshInterval()">
+                <option value="0">Manual only</option>
+                <option value="15">Every 15 seconds</option>
+                <option value="30" selected>Every 30 seconds</option>
+                <option value="60">Every 60 seconds</option>
+                <option value="120">Every 2 minutes</option>
+              </select>
+              <div class="mt-2 small text-muted" id="lastRefreshTime">Last refresh: --</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-  </div><!-- end page-content -->
-</div><!-- end main-content -->
+  </div>
+</div>
 
-<!-- ==================== PRODUCT MODAL ==================== -->
+<!-- ========== PRODUCT MODAL ========== -->
 <div class="modal fade" id="productModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -865,127 +492,275 @@ body {
       <form id="productForm" onsubmit="saveProduct(event)">
         <div class="modal-body">
           <input type="hidden" id="pEditId">
-          <div class="mb-3">
-            <label class="form-label">SKU / Code *</label>
-            <input type="text" class="form-control" id="pSku" required placeholder="e.g. PRD-001">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Product Name *</label>
-            <input type="text" class="form-control" id="pName" required placeholder="e.g. Widget A">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Category</label>
-            <input type="text" class="form-control" id="pCategory" placeholder="e.g. Electronics">
-          </div>
+          <div class="mb-3"><label class="form-label">SKU / Code *</label><input type="text" class="form-control" id="pSku" required placeholder="e.g. PRD-001"></div>
+          <div class="mb-3"><label class="form-label">Product Name *</label><input type="text" class="form-control" id="pName" required placeholder="e.g. Widget A"></div>
+          <div class="mb-3"><label class="form-label">Category</label><input type="text" class="form-control" id="pCategory" placeholder="e.g. Electronics"></div>
           <div class="row g-3">
-            <div class="col-6">
-              <label class="form-label">Unit</label>
-              <input type="text" class="form-control" id="pUnit" placeholder="e.g. pcs, kg, box" value="pcs">
-            </div>
-            <div class="col-6">
-              <label class="form-label">Min Stock Level</label>
-              <input type="number" class="form-control" id="pMinStock" min="0" value="10">
-            </div>
+            <div class="col-6"><label class="form-label">Unit</label><input type="text" class="form-control" id="pUnit" placeholder="e.g. pcs, kg" value="pcs"></div>
+            <div class="col-6"><label class="form-label">Min Stock Level</label><input type="number" class="form-control" id="pMinStock" min="0" value="10"></div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i> Save Product
-          </button>
+          <button type="submit" class="btn btn-primary" id="btnSaveProduct"><i class="bi bi-check-lg me-1"></i>Save Product</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 // ============================================================
-//  DATA LAYER
-// ============================================================
-const STORAGE_KEY = 'inventrackData';
-
-function getDefaultData() {
-  return { products: [], transactions: [], nextProductId: 1, nextTxId: 1 };
-}
-
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) { console.error('Load error', e); }
-  return getDefaultData();
-}
-
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-let appData = loadData();
-
-// ============================================================
-//  ROLE DETECTION
+//  CONFIGURATION
 // ============================================================
 const urlParams = new URLSearchParams(window.location.search);
 const USER_ROLE = urlParams.get('role') === 'staff' ? 'staff' : 'admin';
+
+// API URL: check URL param first (for staff link), then localStorage
+let API_URL = '';
+const urlApiParam = urlParams.get('api');
+if (urlApiParam) {
+  try { API_URL = atob(urlApiParam); localStorage.setItem('inventrackApiUrl', API_URL); }
+  catch(e) { console.error('Invalid api param'); }
+}
+if (!API_URL) {
+  API_URL = localStorage.getItem('inventrackApiUrl') || '';
+}
+
+// App data cache
+let appData = { products: [], transactions: [] };
+let refreshTimer = null;
+
+// ============================================================
+//  API LAYER
+// ============================================================
+async function apiGet(action) {
+  const url = API_URL + '?action=' + encodeURIComponent(action) + '&t=' + Date.now();
+  const resp = await fetch(url, { redirect: 'follow' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return await resp.json();
+}
+
+async function apiPost(action, data) {
+  const resp = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, data }),
+    redirect: 'follow'
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return await resp.json();
+}
+
+async function loadAllData() {
+  setSyncStatus('loading', 'Syncing...');
+  try {
+    const result = await apiGet('getAll');
+    if (result.success) {
+      appData = { products: result.products || [], transactions: result.transactions || [] };
+      setSyncStatus('online', 'Synced');
+      document.getElementById('lastRefreshTime').textContent =
+        'Last refresh: ' + new Date().toLocaleTimeString();
+    } else {
+      throw new Error(result.error || 'Failed to load');
+    }
+  } catch(err) {
+    console.error('Load error:', err);
+    setSyncStatus('error', 'Sync failed');
+    throw err;
+  }
+}
+
+async function refreshData() {
+  try {
+    await loadAllData();
+    refreshAllViews();
+    showToast('Data refreshed', 'success');
+  } catch(err) {
+    showToast('Failed to refresh: ' + err.message, 'error');
+  }
+}
+
+function setSyncStatus(status, text) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  dot.className = 'sync-dot ' + status;
+  txt.textContent = text;
+}
+
+// ============================================================
+//  SETUP SCREEN
+// ============================================================
+async function testAndConnect() {
+  const url = document.getElementById('setupApiUrl').value.trim();
+  const btn = document.getElementById('setupConnectBtn');
+  const errEl = document.getElementById('setupError');
+  const sucEl = document.getElementById('setupSuccess');
+
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  if (!url) { errEl.textContent = 'Please enter a URL'; errEl.style.display = 'block'; return; }
+  if (!url.startsWith('https://script.google.com/')) {
+    errEl.textContent = 'URL should start with https://script.google.com/';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.classList.add('btn-loading');
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch(url + '?action=ping&t=' + Date.now(), { redirect: 'follow' });
+    const result = await resp.json();
+    if (result.success) {
+      sucEl.textContent = '✅ ' + result.message;
+      sucEl.style.display = 'block';
+
+      // Save and proceed
+      API_URL = url;
+      localStorage.setItem('inventrackApiUrl', url);
+
+      setTimeout(async () => {
+        document.getElementById('setupScreen').classList.add('hidden');
+        await initApp();
+      }, 1000);
+    } else {
+      throw new Error(result.error || 'Connection failed');
+    }
+  } catch(err) {
+    errEl.textContent = '❌ Connection failed: ' + err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.classList.remove('btn-loading');
+    btn.disabled = false;
+  }
+}
+
+async function testCurrentConnection() {
+  try {
+    setSyncStatus('loading', 'Testing...');
+    const result = await apiGet('ping');
+    if (result.success) {
+      showToast('✅ Connection OK: ' + result.message);
+      setSyncStatus('online', 'Connected');
+    } else {
+      throw new Error(result.error);
+    }
+  } catch(err) {
+    showToast('❌ Connection failed: ' + err.message, 'error');
+    setSyncStatus('error', 'Failed');
+  }
+}
+
+function changeApiUrl() {
+  const newUrl = prompt('Enter new Google Apps Script Web App URL:', API_URL);
+  if (newUrl && newUrl.trim()) {
+    API_URL = newUrl.trim();
+    localStorage.setItem('inventrackApiUrl', API_URL);
+    updateSettingsDisplay();
+    testCurrentConnection();
+  }
+}
+
+// ============================================================
+//  INITIALIZATION
+// ============================================================
+async function initApp() {
+  initRole();
+  showLoadingOverlay(true, 'Loading inventory data...');
+
+  try {
+    await loadAllData();
+    refreshAllViews();
+    updateSettingsDisplay();
+    showLoadingOverlay(false);
+    startAutoRefresh();
+
+    if (USER_ROLE === 'staff') showPage('stockin');
+    else showPage('dashboard');
+  } catch(err) {
+    showLoadingOverlay(false);
+    showToast('Failed to load data: ' + err.message, 'error');
+  }
+}
 
 function initRole() {
   const badge = document.getElementById('roleBadge');
   if (USER_ROLE === 'staff') {
     badge.className = 'role-badge staff';
     badge.innerHTML = '<i class="bi bi-person-fill"></i> Staff';
-    // Hide admin-only elements
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('[id^="adminSection"]').forEach(el => el.style.display = 'none');
-    // Hide add product button for staff
-    const addBtn = document.querySelector('#page-products .card-header .btn-primary');
+    const addBtn = document.getElementById('addProductBtn');
     if (addBtn) addBtn.style.display = 'none';
   }
-  // Set staff link
-  const staffLink = window.location.origin + window.location.pathname + '?role=staff';
-  document.getElementById('staffLink').textContent = staffLink;
+}
+
+function showLoadingOverlay(show, text) {
+  const ol = document.getElementById('loadingOverlay');
+  if (text) document.getElementById('loadingText').textContent = text;
+  if (show) ol.classList.remove('hidden');
+  else ol.classList.add('hidden');
+}
+
+function updateSettingsDisplay() {
+  document.getElementById('currentApiUrl').textContent = API_URL || 'Not configured';
+  // Staff link
+  const base = window.location.origin + window.location.pathname;
+  const encodedApi = btoa(API_URL);
+  const staffUrl = base + '?role=staff&api=' + encodedApi;
+  document.getElementById('staffLink').textContent = staffUrl;
+  // Sheet link (extract spreadsheet URL from script URL)
+  const sheetLink = document.getElementById('sheetLink');
+  sheetLink.href = API_URL.replace('/exec', '').replace('macros/s/', 'a/') || '#';
+}
+
+function startAutoRefresh() {
+  const saved = localStorage.getItem('inventrackRefreshInterval');
+  if (saved !== null) document.getElementById('refreshInterval').value = saved;
+  setRefreshInterval();
+}
+
+function setRefreshInterval() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  const seconds = parseInt(document.getElementById('refreshInterval').value) || 0;
+  localStorage.setItem('inventrackRefreshInterval', seconds);
+  if (seconds > 0) {
+    refreshTimer = setInterval(async () => {
+      try {
+        await loadAllData();
+        refreshAllViews();
+      } catch(e) { console.error('Auto-refresh failed:', e); }
+    }, seconds * 1000);
+  }
 }
 
 // ============================================================
 //  NAVIGATION
 // ============================================================
 function showPage(pageId) {
-  // Role check
-  const adminPages = ['dashboard', 'transactions', 'export', 'settings'];
-  if (USER_ROLE === 'staff' && adminPages.includes(pageId)) {
-    pageId = 'stockin';
-  }
+  const adminPages = ['dashboard','transactions','export','settings'];
+  if (USER_ROLE === 'staff' && adminPages.includes(pageId)) pageId = 'stockin';
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
   const page = document.getElementById('page-' + pageId);
-  const nav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+  const nav = document.querySelector('.nav-item[data-page="'+pageId+'"]');
   if (page) page.classList.add('active');
   if (nav) nav.classList.add('active');
 
-  const titles = {
-    dashboard: 'Dashboard', products: 'Products',
-    stockin: 'Stock In', stockout: 'Stock Out',
-    transactions: 'Transaction History',
-    export: 'Export to Excel', settings: 'Settings'
-  };
+  const titles = { dashboard:'Dashboard', products:'Products', stockin:'Stock In',
+    stockout:'Stock Out', transactions:'Transaction History', export:'Export to Excel', settings:'Settings' };
   document.getElementById('pageTitle').textContent = titles[pageId] || pageId;
 
-  // Refresh data on page show
   if (pageId === 'dashboard') refreshDashboard();
   if (pageId === 'products') renderProducts();
-  if (pageId === 'stockin') populateProductSelects();
-  if (pageId === 'stockout') populateProductSelects();
+  if (pageId === 'stockin' || pageId === 'stockout') populateProductSelects();
   if (pageId === 'transactions') { populateTxFilterProducts(); renderTransactions(); }
 
-  // Close mobile sidebar
   if (window.innerWidth <= 768) toggleSidebar(false);
 }
 
@@ -998,60 +773,57 @@ function toggleSidebar(forceShow) {
 }
 
 // ============================================================
-//  TOAST NOTIFICATIONS
+//  TOAST
 // ============================================================
 function showToast(message, type = 'success') {
   const container = document.getElementById('toastContainer');
-  const icons = { success: 'check-circle-fill', error: 'x-circle-fill', warning: 'exclamation-triangle-fill' };
-  const colors = { success: '#2ec4b6', error: '#e63946', warning: '#f77f00' };
+  const icons = { success:'check-circle-fill', error:'x-circle-fill', warning:'exclamation-triangle-fill' };
+  const colors = { success:'#2ec4b6', error:'#e63946', warning:'#f77f00' };
+  const t = document.createElement('div');
+  t.className = 'custom-toast ' + type;
+  t.innerHTML = `<i class="bi bi-${icons[type]||icons.success}" style="color:${colors[type]};font-size:20px;"></i><span style="font-size:14px;">${escHtml(message)}</span>`;
+  container.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3500);
+}
 
-  const toast = document.createElement('div');
-  toast.className = `custom-toast ${type}`;
-  toast.innerHTML = `
-    <i class="bi bi-${icons[type] || icons.success}" style="color:${colors[type]};font-size:20px;"></i>
-    <span style="font-size:14px;">${message}</span>
-  `;
-  container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+// ============================================================
+//  REFRESH ALL VIEWS
+// ============================================================
+function refreshAllViews() {
+  refreshDashboard();
+  renderProducts();
+  populateProductSelects();
+  document.getElementById('productCount').textContent = appData.products.length;
 }
 
 // ============================================================
 //  DASHBOARD
 // ============================================================
 function refreshDashboard() {
-  const products = appData.products;
-  const totalQty = products.reduce((s, p) => s + p.quantity, 0);
-  const totalValue = products.reduce((s, p) => s + (p.quantity * p.averageCost), 0);
-  const lowStock = products.filter(p => p.quantity <= p.minStock).length;
+  const prods = appData.products;
+  const totalQty = prods.reduce((s,p) => s + p.quantity, 0);
+  const totalVal = prods.reduce((s,p) => s + p.quantity * p.averageCost, 0);
+  const lowStock = prods.filter(p => p.quantity <= p.minStock).length;
 
-  document.getElementById('statProducts').textContent = products.length;
+  document.getElementById('statProducts').textContent = prods.length;
   document.getElementById('statTotalQty').textContent = totalQty.toLocaleString();
-  document.getElementById('statTotalValue').textContent = '$' + totalValue.toFixed(2);
+  document.getElementById('statTotalValue').textContent = '$' + totalVal.toFixed(2);
   document.getElementById('statLowStock').textContent = lowStock;
 
-  // Low stock list
-  const lowItems = products.filter(p => p.quantity <= p.minStock);
-  const lowListEl = document.getElementById('lowStockList');
+  // Low stock
+  const lowItems = prods.filter(p => p.quantity <= p.minStock);
+  const lowEl = document.getElementById('lowStockList');
   if (lowItems.length === 0) {
-    lowListEl.innerHTML = `<div class="text-center text-muted py-3">
-      <i class="bi bi-check-circle" style="font-size:30px;opacity:0.3;"></i>
-      <p class="mt-2 mb-0 small">All stock levels are healthy</p></div>`;
+    lowEl.innerHTML = '<div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All stock levels are healthy</p></div>';
   } else {
-    lowListEl.innerHTML = lowItems.map(p => `
+    lowEl.innerHTML = lowItems.map(p => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0;">
-        <div>
-          <strong style="font-size:14px;">${escHtml(p.name)}</strong>
-          <div class="text-muted" style="font-size:12px;">${escHtml(p.sku)}</div>
-        </div>
-        <div style="text-align:right;">
-          <span class="badge-low">${p.quantity} ${escHtml(p.unit)}</span>
-          <div class="text-muted" style="font-size:11px;">Min: ${p.minStock}</div>
-        </div>
-      </div>
-    `).join('');
+        <div><strong style="font-size:14px;">${escHtml(p.name)}</strong><div class="text-muted" style="font-size:12px;">${escHtml(p.sku)}</div></div>
+        <div style="text-align:right;"><span class="badge-low">${p.quantity} ${escHtml(p.unit)}</span><div class="text-muted" style="font-size:11px;">Min: ${p.minStock}</div></div>
+      </div>`).join('');
   }
 
-  // Recent transactions (last 8)
+  // Recent transactions
   const recent = [...appData.transactions].reverse().slice(0, 8);
   const tbody = document.getElementById('recentTransBody');
   if (recent.length === 0) {
@@ -1059,18 +831,11 @@ function refreshDashboard() {
   } else {
     tbody.innerHTML = recent.map(tx => {
       const prod = appData.products.find(p => p.id === tx.productId);
-      return `<tr>
-        <td>${tx.date}</td>
-        <td>${prod ? escHtml(prod.name) : 'Deleted'}</td>
-        <td><span class="badge-${tx.type === 'IN' ? 'in' : 'out'}">${tx.type === 'IN' ? '▲ IN' : '▼ OUT'}</span></td>
-        <td>${tx.quantity}</td>
-        <td>$${tx.totalCost.toFixed(2)}</td>
-      </tr>`;
+      return `<tr><td>${tx.date}</td><td>${prod ? escHtml(prod.name) : 'Deleted'}</td>
+        <td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td>
+        <td>${tx.quantity}</td><td>$${tx.totalCost.toFixed(2)}</td></tr>`;
     }).join('');
   }
-
-  // Update product count badge
-  document.getElementById('productCount').textContent = products.length;
 }
 
 // ============================================================
@@ -1078,49 +843,29 @@ function refreshDashboard() {
 // ============================================================
 function renderProducts() {
   const search = (document.getElementById('productSearch').value || '').toLowerCase();
-  let products = appData.products;
-  if (search) {
-    products = products.filter(p =>
-      p.name.toLowerCase().includes(search) ||
-      p.sku.toLowerCase().includes(search) ||
-      (p.category || '').toLowerCase().includes(search)
-    );
-  }
+  let prods = appData.products;
+  if (search) prods = prods.filter(p => p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search) || (p.category||'').toLowerCase().includes(search));
 
   const tbody = document.getElementById('productsTableBody');
-  if (products.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8">
-      <div class="empty-state">
-        <i class="bi bi-box-seam"></i>
-        <h5>No Products Found</h5>
-        <p>Add your first product to get started</p>
-      </div></td></tr>`;
+  if (prods.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="bi bi-box-seam"></i><h5>No Products Found</h5><p>Add your first product to get started</p></div></td></tr>';
     return;
   }
-
-  tbody.innerHTML = products.map(p => {
-    const totalVal = p.quantity * p.averageCost;
-    const isLow = p.quantity <= p.minStock;
+  tbody.innerHTML = prods.map(p => {
+    const tv = p.quantity * p.averageCost;
+    const low = p.quantity <= p.minStock;
     return `<tr>
       <td><code>${escHtml(p.sku)}</code></td>
       <td><strong>${escHtml(p.name)}</strong></td>
-      <td>${escHtml(p.category || '-')}</td>
+      <td>${escHtml(p.category||'-')}</td>
       <td><strong>${p.quantity}</strong> <small class="text-muted">${escHtml(p.unit)}</small></td>
       <td>$${p.averageCost.toFixed(4)}</td>
-      <td><strong>$${totalVal.toFixed(2)}</strong></td>
-      <td>${isLow ? '<span class="badge-low">Low Stock</span>' : '<span class="badge-ok">OK</span>'}</td>
-      <td>
-        <div style="display:flex;gap:4px;">
-          ${USER_ROLE === 'admin' ? `
-          <button class="btn-icon success" onclick="openProductModal(${p.id})" title="Edit">
-            <i class="bi bi-pencil-fill" style="font-size:13px;"></i>
-          </button>
-          <button class="btn-icon danger" onclick="deleteProduct(${p.id})" title="Delete">
-            <i class="bi bi-trash-fill" style="font-size:13px;"></i>
-          </button>` : '-'}
-        </div>
-      </td>
-    </tr>`;
+      <td><strong>$${tv.toFixed(2)}</strong></td>
+      <td>${low ? '<span class="badge-low">Low Stock</span>' : '<span class="badge-ok">OK</span>'}</td>
+      <td><div style="display:flex;gap:4px;">${USER_ROLE==='admin' ?
+        `<button class="btn-icon success" onclick="openProductModal(${p.id})" title="Edit"><i class="bi bi-pencil-fill" style="font-size:13px;"></i></button>
+         <button class="btn-icon danger" onclick="deleteProduct(${p.id})" title="Delete"><i class="bi bi-trash-fill" style="font-size:13px;"></i></button>` : '-'
+      }</div></td></tr>`;
   }).join('');
 }
 
@@ -1144,88 +889,96 @@ function openProductModal(editId) {
   } else {
     document.getElementById('productModalTitle').textContent = 'Add New Product';
   }
-
   new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
-function saveProduct(e) {
+async function saveProduct(e) {
   e.preventDefault();
+  const btn = document.getElementById('btnSaveProduct');
+  btn.classList.add('btn-loading'); btn.disabled = true;
+
   const editId = document.getElementById('pEditId').value;
-  const sku = document.getElementById('pSku').value.trim();
-  const name = document.getElementById('pName').value.trim();
-  const category = document.getElementById('pCategory').value.trim();
-  const unit = document.getElementById('pUnit').value.trim() || 'pcs';
-  const minStock = parseInt(document.getElementById('pMinStock').value) || 10;
+  const data = {
+    sku: document.getElementById('pSku').value.trim(),
+    name: document.getElementById('pName').value.trim(),
+    category: document.getElementById('pCategory').value.trim(),
+    unit: document.getElementById('pUnit').value.trim() || 'pcs',
+    minStock: parseInt(document.getElementById('pMinStock').value) || 10
+  };
 
-  if (editId) {
-    // Edit existing
-    const p = appData.products.find(x => x.id === parseInt(editId));
-    if (p) {
-      p.sku = sku; p.name = name; p.category = category;
-      p.unit = unit; p.minStock = minStock;
+  try {
+    let result;
+    if (editId) {
+      data.id = parseInt(editId);
+      result = await apiPost('updateProduct', data);
+    } else {
+      result = await apiPost('addProduct', data);
     }
-    showToast('Product updated successfully');
-  } else {
-    // Check duplicate SKU
-    if (appData.products.some(p => p.sku.toLowerCase() === sku.toLowerCase())) {
-      showToast('SKU already exists!', 'error');
-      return;
+
+    if (result.success) {
+      showToast(result.message);
+      bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+      await loadAllData();
+      refreshAllViews();
+    } else {
+      showToast(result.error || 'Failed', 'error');
     }
-    appData.products.push({
-      id: appData.nextProductId++,
-      sku, name, category, unit, minStock,
-      quantity: 0, averageCost: 0
-    });
-    showToast('Product added successfully');
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.classList.remove('btn-loading'); btn.disabled = false;
   }
-
-  saveData(appData);
-  bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
-  renderProducts();
-  refreshDashboard();
 }
 
-function deleteProduct(id) {
+async function deleteProduct(id) {
   const p = appData.products.find(x => x.id === id);
   if (!p) return;
-  if (!confirm(`Delete "${p.name}"? This will NOT delete related transactions.`)) return;
-  appData.products = appData.products.filter(x => x.id !== id);
-  saveData(appData);
-  renderProducts();
-  refreshDashboard();
-  showToast('Product deleted', 'warning');
+  if (!confirm('Delete "' + p.name + '"? This cannot be undone.')) return;
+
+  try {
+    const result = await apiPost('deleteProduct', { id });
+    if (result.success) {
+      showToast(result.message, 'warning');
+      await loadAllData();
+      refreshAllViews();
+    } else {
+      showToast(result.error || 'Failed', 'error');
+    }
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  }
 }
 
 // ============================================================
-//  POPULATE PRODUCT SELECTS
+//  PRODUCT SELECTS
 // ============================================================
 function populateProductSelects() {
-  const options = '<option value="">-- Select Product --</option>' +
+  const opts = '<option value="">-- Select Product --</option>' +
     appData.products.map(p =>
       `<option value="${p.id}">${escHtml(p.sku)} - ${escHtml(p.name)} (Stock: ${p.quantity})</option>`
     ).join('');
 
   const si = document.getElementById('siProduct');
   const so = document.getElementById('soProduct');
-  if (si) si.innerHTML = options;
-  if (so) so.innerHTML = options;
+  if (si) si.innerHTML = opts;
+  if (so) so.innerHTML = opts;
 
-  // Reset forms
   document.getElementById('stockInForm').reset();
   document.getElementById('stockOutForm').reset();
   document.getElementById('siTotalCost').value = '';
   document.getElementById('soTotalCost').value = '';
 
-  // Set today's date
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('siDate').value = today;
   document.getElementById('soDate').value = today;
 
-  // Reset info panels
-  document.getElementById('siInfoPanel').innerHTML =
-    '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:0.3;"></i><p class="mt-2">Select a product to see current info</p></div>';
-  document.getElementById('soInfoPanel').innerHTML =
-    '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:0.3;"></i><p class="mt-2">Select a product to see current info</p></div>';
+  resetInfoPanel('siInfoPanel');
+  resetInfoPanel('soInfoPanel');
+}
+
+function resetInfoPanel(id) {
+  document.getElementById(id).innerHTML =
+    '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product to see current info</p></div>';
 }
 
 // ============================================================
@@ -1235,39 +988,20 @@ function updateStockInInfo() {
   const id = parseInt(document.getElementById('siProduct').value);
   const panel = document.getElementById('siInfoPanel');
   const prod = appData.products.find(p => p.id === id);
-  if (!prod) {
-    panel.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:0.3;"></i><p class="mt-2">Select a product to see current info</p></div>';
-    return;
-  }
-  const totalVal = prod.quantity * prod.averageCost;
+  if (!prod) { resetInfoPanel('siInfoPanel'); return; }
+  const tv = prod.quantity * prod.averageCost;
   panel.innerHTML = `
     <div class="mb-3 p-3 rounded" style="background:#f8f9fa;">
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">Product</span>
-        <strong>${escHtml(prod.name)}</strong>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">SKU</span>
-        <code>${escHtml(prod.sku)}</code>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">Current Stock</span>
-        <strong>${prod.quantity} ${escHtml(prod.unit)}</strong>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">Average Cost</span>
-        <strong>$${prod.averageCost.toFixed(4)}</strong>
-      </div>
-      <div class="d-flex justify-content-between">
-        <span class="text-muted small">Total Value</span>
-        <strong>$${totalVal.toFixed(2)}</strong>
-      </div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Product</span><strong>${escHtml(prod.name)}</strong></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">SKU</span><code>${escHtml(prod.sku)}</code></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Current Stock</span><strong>${prod.quantity} ${escHtml(prod.unit)}</strong></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Average Cost</span><strong>$${prod.averageCost.toFixed(4)}</strong></div>
+      <div class="d-flex justify-content-between"><span class="text-muted small">Total Value</span><strong>$${tv.toFixed(2)}</strong></div>
     </div>
     <div class="p-3 rounded" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">
-      <div class="small" style="opacity:0.8;">New Average Cost (Preview)</div>
+      <div class="small" style="opacity:.8;">New Average Cost (Preview)</div>
       <div style="font-size:24px;font-weight:700;" id="siNewAvgCost">$${prod.averageCost.toFixed(4)}</div>
-    </div>
-  `;
+    </div>`;
   calcStockInTotal();
 }
 
@@ -1277,58 +1011,44 @@ function calcStockInTotal() {
   const total = qty * cost;
   document.getElementById('siTotalCost').value = total > 0 ? '$' + total.toFixed(2) : '';
 
-  // Update preview average cost
   const id = parseInt(document.getElementById('siProduct').value);
   const prod = appData.products.find(p => p.id === id);
-  const previewEl = document.getElementById('siNewAvgCost');
-  if (prod && previewEl && qty > 0 && cost > 0) {
+  const el = document.getElementById('siNewAvgCost');
+  if (prod && el && qty > 0 && cost > 0) {
     const newAvg = ((prod.quantity * prod.averageCost) + (qty * cost)) / (prod.quantity + qty);
-    previewEl.textContent = '$' + newAvg.toFixed(4);
+    el.textContent = '$' + newAvg.toFixed(4);
   }
 }
 
-function processStockIn(e) {
+async function processStockIn(e) {
   e.preventDefault();
-  const productId = parseInt(document.getElementById('siProduct').value);
-  const quantity = parseFloat(document.getElementById('siQuantity').value);
-  const unitCost = parseFloat(document.getElementById('siUnitCost').value);
-  const date = document.getElementById('siDate').value || new Date().toISOString().split('T')[0];
-  const notes = document.getElementById('siNotes').value.trim();
+  const btn = document.getElementById('btnStockIn');
+  btn.classList.add('btn-loading'); btn.disabled = true;
 
-  const prod = appData.products.find(p => p.id === productId);
-  if (!prod) { showToast('Product not found!', 'error'); return; }
-  if (quantity <= 0 || unitCost < 0) { showToast('Invalid quantity or cost!', 'error'); return; }
+  try {
+    const data = {
+      productId: parseInt(document.getElementById('siProduct').value),
+      quantity: parseFloat(document.getElementById('siQuantity').value),
+      unitCost: parseFloat(document.getElementById('siUnitCost').value),
+      date: document.getElementById('siDate').value || new Date().toISOString().split('T')[0],
+      notes: document.getElementById('siNotes').value.trim(),
+      by: USER_ROLE
+    };
 
-  // Calculate new average cost (weighted average)
-  const oldTotal = prod.quantity * prod.averageCost;
-  const newTotal = quantity * unitCost;
-  const newQty = prod.quantity + quantity;
-  const newAvgCost = newQty > 0 ? (oldTotal + newTotal) / newQty : 0;
-
-  // Update product
-  prod.quantity = newQty;
-  prod.averageCost = newAvgCost;
-
-  // Record transaction
-  appData.transactions.push({
-    id: appData.nextTxId++,
-    productId,
-    type: 'IN',
-    quantity,
-    unitCost,
-    totalCost: quantity * unitCost,
-    avgCostAfter: newAvgCost,
-    stockAfter: newQty,
-    date,
-    notes,
-    by: USER_ROLE,
-    timestamp: new Date().toISOString()
-  });
-
-  saveData(appData);
-  showToast(`Stock In: +${quantity} ${prod.unit} of ${prod.name}`);
-  populateProductSelects();
-  refreshDashboard();
+    const result = await apiPost('stockIn', data);
+    if (result.success) {
+      showToast(result.message);
+      await loadAllData();
+      refreshAllViews();
+      populateProductSelects();
+    } else {
+      showToast(result.error || 'Failed', 'error');
+    }
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.classList.remove('btn-loading'); btn.disabled = false;
+  }
 }
 
 // ============================================================
@@ -1338,39 +1058,21 @@ function updateStockOutInfo() {
   const id = parseInt(document.getElementById('soProduct').value);
   const panel = document.getElementById('soInfoPanel');
   const prod = appData.products.find(p => p.id === id);
-  if (!prod) {
-    panel.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:0.3;"></i><p class="mt-2">Select a product to see current info</p></div>';
-    return;
-  }
-  const totalVal = prod.quantity * prod.averageCost;
+  if (!prod) { resetInfoPanel('soInfoPanel'); return; }
+  const tv = prod.quantity * prod.averageCost;
   panel.innerHTML = `
     <div class="mb-3 p-3 rounded" style="background:#f8f9fa;">
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">Product</span>
-        <strong>${escHtml(prod.name)}</strong>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">Current Stock</span>
-        <strong style="color:${prod.quantity <= prod.minStock ? 'var(--danger)' : 'inherit'};">
-          ${prod.quantity} ${escHtml(prod.unit)}
-        </strong>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted small">Average Cost</span>
-        <strong>$${prod.averageCost.toFixed(4)}</strong>
-      </div>
-      <div class="d-flex justify-content-between">
-        <span class="text-muted small">Total Value</span>
-        <strong>$${totalVal.toFixed(2)}</strong>
-      </div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Product</span><strong>${escHtml(prod.name)}</strong></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Current Stock</span>
+        <strong style="color:${prod.quantity <= prod.minStock ? 'var(--danger)' : 'inherit'};">${prod.quantity} ${escHtml(prod.unit)}</strong></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Average Cost</span><strong>$${prod.averageCost.toFixed(4)}</strong></div>
+      <div class="d-flex justify-content-between"><span class="text-muted small">Total Value</span><strong>$${tv.toFixed(2)}</strong></div>
     </div>
     <div class="alert alert-warning small mb-0">
       <i class="bi bi-info-circle me-1"></i>
-      Stock out will use the current average cost of <strong>$${prod.averageCost.toFixed(4)}</strong> per unit to calculate cost.
+      Stock out uses average cost of <strong>$${prod.averageCost.toFixed(4)}</strong>/unit.
       <br>Maximum quantity: <strong>${prod.quantity}</strong>
-    </div>
-  `;
-  // Set max quantity
+    </div>`;
   document.getElementById('soQuantity').max = prod.quantity;
   calcStockOutTotal();
 }
@@ -1379,98 +1081,76 @@ function calcStockOutTotal() {
   const id = parseInt(document.getElementById('soProduct').value);
   const qty = parseFloat(document.getElementById('soQuantity').value) || 0;
   const prod = appData.products.find(p => p.id === id);
-  if (prod && qty > 0) {
-    const total = qty * prod.averageCost;
-    document.getElementById('soTotalCost').value = '$' + total.toFixed(2);
-  } else {
-    document.getElementById('soTotalCost').value = '';
-  }
+  document.getElementById('soTotalCost').value = (prod && qty > 0) ? '$' + (qty * prod.averageCost).toFixed(2) : '';
 }
 
-function processStockOut(e) {
+async function processStockOut(e) {
   e.preventDefault();
-  const productId = parseInt(document.getElementById('soProduct').value);
-  const quantity = parseFloat(document.getElementById('soQuantity').value);
-  const date = document.getElementById('soDate').value || new Date().toISOString().split('T')[0];
-  const notes = document.getElementById('soNotes').value.trim();
+  const btn = document.getElementById('btnStockOut');
+  btn.classList.add('btn-loading'); btn.disabled = true;
 
-  const prod = appData.products.find(p => p.id === productId);
-  if (!prod) { showToast('Product not found!', 'error'); return; }
-  if (quantity <= 0) { showToast('Invalid quantity!', 'error'); return; }
-  if (quantity > prod.quantity) {
-    showToast(`Insufficient stock! Available: ${prod.quantity} ${prod.unit}`, 'error');
-    return;
+  try {
+    const data = {
+      productId: parseInt(document.getElementById('soProduct').value),
+      quantity: parseFloat(document.getElementById('soQuantity').value),
+      date: document.getElementById('soDate').value || new Date().toISOString().split('T')[0],
+      notes: document.getElementById('soNotes').value.trim(),
+      by: USER_ROLE
+    };
+
+    const result = await apiPost('stockOut', data);
+    if (result.success) {
+      showToast(result.message);
+      await loadAllData();
+      refreshAllViews();
+      populateProductSelects();
+    } else {
+      showToast(result.error || 'Failed', 'error');
+    }
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.classList.remove('btn-loading'); btn.disabled = false;
   }
-
-  const costOut = quantity * prod.averageCost;
-  // Average cost stays the same on stock out
-  prod.quantity -= quantity;
-
-  // Record transaction
-  appData.transactions.push({
-    id: appData.nextTxId++,
-    productId,
-    type: 'OUT',
-    quantity,
-    unitCost: prod.averageCost,
-    totalCost: costOut,
-    avgCostAfter: prod.averageCost,
-    stockAfter: prod.quantity,
-    date,
-    notes,
-    by: USER_ROLE,
-    timestamp: new Date().toISOString()
-  });
-
-  saveData(appData);
-  showToast(`Stock Out: -${quantity} ${prod.unit} of ${prod.name}`);
-  populateProductSelects();
-  refreshDashboard();
 }
 
 // ============================================================
 //  TRANSACTIONS
 // ============================================================
 function populateTxFilterProducts() {
-  const select = document.getElementById('txFilterProduct');
-  select.innerHTML = '<option value="">All Products</option>' +
-    appData.products.map(p =>
-      `<option value="${p.id}">${escHtml(p.sku)} - ${escHtml(p.name)}</option>`
-    ).join('');
+  document.getElementById('txFilterProduct').innerHTML = '<option value="">All Products</option>' +
+    appData.products.map(p => `<option value="${p.id}">${escHtml(p.sku)} - ${escHtml(p.name)}</option>`).join('');
 }
 
 function renderTransactions() {
-  const typeFilter = document.getElementById('txFilterType').value;
-  const prodFilter = document.getElementById('txFilterProduct').value;
-  const fromDate = document.getElementById('txFilterFrom').value;
-  const toDate = document.getElementById('txFilterTo').value;
+  const typeF = document.getElementById('txFilterType').value;
+  const prodF = document.getElementById('txFilterProduct').value;
+  const fromF = document.getElementById('txFilterFrom').value;
+  const toF   = document.getElementById('txFilterTo').value;
 
   let txs = [...appData.transactions].reverse();
-
-  if (typeFilter) txs = txs.filter(t => t.type === typeFilter);
-  if (prodFilter) txs = txs.filter(t => t.productId === parseInt(prodFilter));
-  if (fromDate) txs = txs.filter(t => t.date >= fromDate);
-  if (toDate) txs = txs.filter(t => t.date <= toDate);
+  if (typeF) txs = txs.filter(t => t.type === typeF);
+  if (prodF) txs = txs.filter(t => t.productId === parseInt(prodF));
+  if (fromF) txs = txs.filter(t => t.date >= fromF);
+  if (toF)   txs = txs.filter(t => t.date <= toF);
 
   const tbody = document.getElementById('transactionsTableBody');
   if (txs.length === 0) {
     tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">No transactions found</td></tr>';
     return;
   }
-
-  tbody.innerHTML = txs.map((tx, i) => {
+  tbody.innerHTML = txs.map(tx => {
     const prod = appData.products.find(p => p.id === tx.productId);
     return `<tr>
-      <td>${tx.id}</td>
-      <td>${tx.date}</td>
+      <td>${tx.id}</td><td>${tx.date}</td>
       <td>${prod ? escHtml(prod.name) : '<em class="text-muted">Deleted</em>'}</td>
-      <td><span class="badge-${tx.type === 'IN' ? 'in' : 'out'}">${tx.type === 'IN' ? '▲ IN' : '▼ OUT'}</span></td>
-      <td>${tx.type === 'IN' ? '+' : '-'}${tx.quantity}</td>
+      <td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td>
+      <td>${tx.type==='IN'?'+':'-'}${tx.quantity}</td>
       <td>$${tx.unitCost.toFixed(4)}</td>
       <td><strong>$${tx.totalCost.toFixed(2)}</strong></td>
-      <td>$${(tx.avgCostAfter || 0).toFixed(4)}</td>
-      <td class="text-muted small">${escHtml(tx.notes || '-')}</td>
-      <td><span class="badge ${tx.by === 'admin' ? 'bg-success' : 'bg-warning text-dark'}" style="font-size:10px;">${tx.by || '-'}</span></td>
+      <td>$${(tx.avgCostAfter||0).toFixed(4)}</td>
+      <td class="text-muted small">${escHtml(tx.notes||'-')}</td>
+      <td><span class="badge ${tx.by==='admin'?'bg-success':'bg-warning text-dark'}" style="font-size:10px;">${tx.by||'-'}</span></td>
     </tr>`;
   }).join('');
 }
@@ -1484,272 +1164,147 @@ function clearTxFilters() {
 }
 
 // ============================================================
-//  EXPORT TO EXCEL
+//  EXPORT EXCEL
 // ============================================================
 function exportProducts() {
-  if (appData.products.length === 0) {
-    showToast('No products to export!', 'warning');
-    return;
-  }
-
+  if (!appData.products.length) { showToast('No products to export!','warning'); return; }
   const data = appData.products.map(p => ({
-    'SKU': p.sku,
-    'Product Name': p.name,
-    'Category': p.category || '',
-    'Unit': p.unit,
-    'Quantity': p.quantity,
-    'Average Cost': parseFloat(p.averageCost.toFixed(4)),
-    'Total Value': parseFloat((p.quantity * p.averageCost).toFixed(2)),
-    'Min Stock': p.minStock,
-    'Status': p.quantity <= p.minStock ? 'LOW STOCK' : 'OK'
+    'SKU':p.sku, 'Product Name':p.name, 'Category':p.category||'', 'Unit':p.unit,
+    'Quantity':p.quantity, 'Average Cost':+p.averageCost.toFixed(4),
+    'Total Value':+(p.quantity*p.averageCost).toFixed(2), 'Min Stock':p.minStock,
+    'Status':p.quantity<=p.minStock?'LOW STOCK':'OK'
   }));
-
   const ws = XLSX.utils.json_to_sheet(data);
+  ws['!cols'] = [{wch:12},{wch:25},{wch:15},{wch:8},{wch:10},{wch:14},{wch:14},{wch:10},{wch:12}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Products');
-
-  // Set column widths
-  ws['!cols'] = [
-    {wch:12},{wch:25},{wch:15},{wch:8},{wch:10},{wch:14},{wch:14},{wch:10},{wch:12}
-  ];
-
-  XLSX.writeFile(wb, `Products_${getDateStamp()}.xlsx`);
-  showToast('Products exported successfully!');
+  XLSX.writeFile(wb, 'Products_'+getDateStamp()+'.xlsx');
+  showToast('Products exported!');
 }
 
 function exportTransactions() {
-  if (appData.transactions.length === 0) {
-    showToast('No transactions to export!', 'warning');
-    return;
-  }
-
+  if (!appData.transactions.length) { showToast('No transactions!','warning'); return; }
   const data = appData.transactions.map(tx => {
     const prod = appData.products.find(p => p.id === tx.productId);
-    return {
-      'ID': tx.id,
-      'Date': tx.date,
-      'Product SKU': prod ? prod.sku : 'N/A',
-      'Product Name': prod ? prod.name : 'Deleted',
-      'Type': tx.type,
-      'Quantity': tx.type === 'IN' ? tx.quantity : -tx.quantity,
-      'Unit Cost': parseFloat(tx.unitCost.toFixed(4)),
-      'Total Cost': parseFloat(tx.totalCost.toFixed(2)),
-      'Avg Cost After': parseFloat((tx.avgCostAfter || 0).toFixed(4)),
-      'Stock After': tx.stockAfter || 0,
-      'Notes': tx.notes || '',
-      'By': tx.by || '',
-      'Timestamp': tx.timestamp || ''
-    };
+    return { 'ID':tx.id, 'Date':tx.date, 'Product SKU':prod?prod.sku:'N/A',
+      'Product Name':prod?prod.name:'Deleted', 'Type':tx.type,
+      'Quantity':tx.type==='IN'?tx.quantity:-tx.quantity,
+      'Unit Cost':+tx.unitCost.toFixed(4), 'Total Cost':+tx.totalCost.toFixed(2),
+      'Avg Cost After':+(tx.avgCostAfter||0).toFixed(4),
+      'Stock After':tx.stockAfter||0, 'Notes':tx.notes||'', 'By':tx.by||'',
+      'Timestamp':tx.timestamp||'' };
   });
-
   const ws = XLSX.utils.json_to_sheet(data);
+  ws['!cols'] = [{wch:6},{wch:12},{wch:12},{wch:25},{wch:6},{wch:10},{wch:12},{wch:12},{wch:14},{wch:10},{wch:20},{wch:8},{wch:22}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
-
-  ws['!cols'] = [
-    {wch:6},{wch:12},{wch:12},{wch:25},{wch:6},{wch:10},{wch:12},{wch:12},{wch:14},{wch:10},{wch:20},{wch:8},{wch:22}
-  ];
-
-  XLSX.writeFile(wb, `Transactions_${getDateStamp()}.xlsx`);
-  showToast('Transactions exported successfully!');
+  XLSX.writeFile(wb, 'Transactions_'+getDateStamp()+'.xlsx');
+  showToast('Transactions exported!');
 }
 
 function exportFullReport() {
-  if (appData.products.length === 0 && appData.transactions.length === 0) {
-    showToast('No data to export!', 'warning');
-    return;
-  }
-
+  if (!appData.products.length && !appData.transactions.length) { showToast('No data!','warning'); return; }
   const wb = XLSX.utils.book_new();
 
-  // Summary Sheet
-  const summaryData = [
-    { 'Metric': 'Total Products', 'Value': appData.products.length },
-    { 'Metric': 'Total Quantity', 'Value': appData.products.reduce((s, p) => s + p.quantity, 0) },
-    { 'Metric': 'Total Inventory Value', 'Value': '$' + appData.products.reduce((s, p) => s + p.quantity * p.averageCost, 0).toFixed(2) },
-    { 'Metric': 'Total Transactions', 'Value': appData.transactions.length },
-    { 'Metric': 'Total Stock In Transactions', 'Value': appData.transactions.filter(t => t.type === 'IN').length },
-    { 'Metric': 'Total Stock Out Transactions', 'Value': appData.transactions.filter(t => t.type === 'OUT').length },
-    { 'Metric': 'Low Stock Items', 'Value': appData.products.filter(p => p.quantity <= p.minStock).length },
-    { 'Metric': 'Report Date', 'Value': new Date().toLocaleDateString() },
+  // Summary
+  const summary = [
+    {'Metric':'Total Products','Value':appData.products.length},
+    {'Metric':'Total Quantity','Value':appData.products.reduce((s,p)=>s+p.quantity,0)},
+    {'Metric':'Total Inventory Value','Value':'$'+appData.products.reduce((s,p)=>s+p.quantity*p.averageCost,0).toFixed(2)},
+    {'Metric':'Total Transactions','Value':appData.transactions.length},
+    {'Metric':'Stock In Count','Value':appData.transactions.filter(t=>t.type==='IN').length},
+    {'Metric':'Stock Out Count','Value':appData.transactions.filter(t=>t.type==='OUT').length},
+    {'Metric':'Low Stock Items','Value':appData.products.filter(p=>p.quantity<=p.minStock).length},
+    {'Metric':'Report Date','Value':new Date().toLocaleDateString()}
   ];
-  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-  wsSummary['!cols'] = [{wch:30},{wch:20}];
-  XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+  const ws1 = XLSX.utils.json_to_sheet(summary);
+  ws1['!cols']=[{wch:30},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
 
-  // Products Sheet
-  const prodData = appData.products.map(p => ({
-    'SKU': p.sku, 'Product Name': p.name, 'Category': p.category || '',
-    'Unit': p.unit, 'Quantity': p.quantity,
-    'Average Cost': parseFloat(p.averageCost.toFixed(4)),
-    'Total Value': parseFloat((p.quantity * p.averageCost).toFixed(2)),
-    'Min Stock': p.minStock,
-    'Status': p.quantity <= p.minStock ? 'LOW STOCK' : 'OK'
-  }));
-  if (prodData.length > 0) {
-    const wsProds = XLSX.utils.json_to_sheet(prodData);
-    wsProds['!cols'] = [{wch:12},{wch:25},{wch:15},{wch:8},{wch:10},{wch:14},{wch:14},{wch:10},{wch:12}];
-    XLSX.utils.book_append_sheet(wb, wsProds, 'Products');
+  if (appData.products.length) {
+    const pd = appData.products.map(p => ({'SKU':p.sku,'Name':p.name,'Category':p.category||'','Unit':p.unit,'Qty':p.quantity,'Avg Cost':+p.averageCost.toFixed(4),'Total Value':+(p.quantity*p.averageCost).toFixed(2),'Min Stock':p.minStock,'Status':p.quantity<=p.minStock?'LOW':'OK'}));
+    const ws2 = XLSX.utils.json_to_sheet(pd);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Products');
+  }
+  if (appData.transactions.length) {
+    const td = appData.transactions.map(tx => {const p=appData.products.find(x=>x.id===tx.productId);return{'ID':tx.id,'Date':tx.date,'Product':p?p.name:'Deleted','Type':tx.type,'Qty':tx.type==='IN'?tx.quantity:-tx.quantity,'Unit Cost':+tx.unitCost.toFixed(4),'Total':+tx.totalCost.toFixed(2),'Avg After':+(tx.avgCostAfter||0).toFixed(4),'Notes':tx.notes||'','By':tx.by||''};});
+    const ws3 = XLSX.utils.json_to_sheet(td);
+    XLSX.utils.book_append_sheet(wb, ws3, 'Transactions');
   }
 
-  // Transactions Sheet
-  const txData = appData.transactions.map(tx => {
-    const prod = appData.products.find(p => p.id === tx.productId);
-    return {
-      'ID': tx.id, 'Date': tx.date,
-      'Product': prod ? prod.name : 'Deleted', 'Type': tx.type,
-      'Quantity': tx.type === 'IN' ? tx.quantity : -tx.quantity,
-      'Unit Cost': parseFloat(tx.unitCost.toFixed(4)),
-      'Total Cost': parseFloat(tx.totalCost.toFixed(2)),
-      'Avg Cost After': parseFloat((tx.avgCostAfter || 0).toFixed(4)),
-      'Notes': tx.notes || '', 'By': tx.by || ''
-    };
-  });
-  if (txData.length > 0) {
-    const wsTx = XLSX.utils.json_to_sheet(txData);
-    wsTx['!cols'] = [{wch:6},{wch:12},{wch:25},{wch:6},{wch:10},{wch:12},{wch:12},{wch:14},{wch:20},{wch:8}];
-    XLSX.utils.book_append_sheet(wb, wsTx, 'Transactions');
-  }
-
-  XLSX.writeFile(wb, `FullReport_${getDateStamp()}.xlsx`);
-  showToast('Full report exported successfully!');
+  XLSX.writeFile(wb, 'FullReport_'+getDateStamp()+'.xlsx');
+  showToast('Full report exported!');
 }
 
 // ============================================================
-//  SETTINGS / DATA MANAGEMENT
+//  SETTINGS ACTIONS
 // ============================================================
 function copyStaffLink() {
   const link = document.getElementById('staffLink').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    showToast('Staff link copied to clipboard!');
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = link; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
-    ta.remove();
-    showToast('Staff link copied to clipboard!');
+  navigator.clipboard.writeText(link).then(() => showToast('Staff link copied!')).catch(() => {
+    const ta = document.createElement('textarea'); ta.value = link; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); showToast('Staff link copied!');
   });
 }
 
-function exportBackup() {
-  const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `inventory_backup_${getDateStamp()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Backup file downloaded!');
-}
-
-function importBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (imported.products && imported.transactions) {
-        if (confirm('This will replace ALL current data. Continue?')) {
-          appData = imported;
-          saveData(appData);
-          refreshAll();
-          showToast('Data restored successfully!');
-        }
-      } else {
-        showToast('Invalid backup file!', 'error');
-      }
-    } catch(err) {
-      showToast('Error reading file!', 'error');
+async function apiLoadDemo() {
+  if (!confirm('This will CLEAR existing data and load demo data. Continue?')) return;
+  try {
+    showLoadingOverlay(true, 'Loading demo data...');
+    const result = await apiPost('loadDemo', {});
+    if (result.success) {
+      showToast(result.message + ' 🎉');
+      await loadAllData();
+      refreshAllViews();
+    } else {
+      showToast(result.error || 'Failed', 'error');
     }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-function clearAllData() {
-  if (!confirm('⚠️ Delete ALL products and transactions? This cannot be undone!')) return;
-  if (!confirm('Are you really sure? Type OK to confirm.')) return;
-  appData = getDefaultData();
-  saveData(appData);
-  refreshAll();
-  showToast('All data cleared', 'warning');
-}
-
-function loadDemoData() {
-  if (appData.products.length > 0) {
-    if (!confirm('This will add demo data to your existing data. Continue?')) return;
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    showLoadingOverlay(false);
   }
+}
 
-  const startId = appData.nextProductId;
-  const demoProducts = [
-    { id: startId, sku: 'WDG-001', name: 'Steel Widget A', category: 'Widgets', unit: 'pcs', minStock: 20, quantity: 150, averageCost: 12.50 },
-    { id: startId+1, sku: 'WDG-002', name: 'Copper Widget B', category: 'Widgets', unit: 'pcs', minStock: 15, quantity: 80, averageCost: 25.75 },
-    { id: startId+2, sku: 'SCR-001', name: 'M5 Screws (Box)', category: 'Fasteners', unit: 'box', minStock: 50, quantity: 200, averageCost: 5.20 },
-    { id: startId+3, sku: 'BRG-001', name: 'Ball Bearing 6205', category: 'Bearings', unit: 'pcs', minStock: 30, quantity: 8, averageCost: 8.90 },
-    { id: startId+4, sku: 'OIL-001', name: 'Machine Oil 5L', category: 'Lubricants', unit: 'can', minStock: 10, quantity: 45, averageCost: 32.00 },
-  ];
-
-  appData.products.push(...demoProducts);
-  appData.nextProductId = startId + 5;
-
-  // Add some demo transactions
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().split('T')[0];
-
-  const demoTx = [
-    { id: appData.nextTxId++, productId: startId, type: 'IN', quantity: 100, unitCost: 12.00, totalCost: 1200, avgCostAfter: 12.00, stockAfter: 100, date: twoDaysAgo, notes: 'Initial purchase', by: 'admin', timestamp: new Date().toISOString() },
-    { id: appData.nextTxId++, productId: startId, type: 'IN', quantity: 50, unitCost: 13.50, totalCost: 675, avgCostAfter: 12.50, stockAfter: 150, date: yesterday, notes: 'Restock from Supplier A', by: 'admin', timestamp: new Date().toISOString() },
-    { id: appData.nextTxId++, productId: startId+1, type: 'IN', quantity: 80, unitCost: 25.75, totalCost: 2060, avgCostAfter: 25.75, stockAfter: 80, date: yesterday, notes: 'New stock', by: 'staff', timestamp: new Date().toISOString() },
-    { id: appData.nextTxId++, productId: startId+2, type: 'IN', quantity: 200, unitCost: 5.20, totalCost: 1040, avgCostAfter: 5.20, stockAfter: 200, date: twoDaysAgo, notes: 'Bulk order', by: 'admin', timestamp: new Date().toISOString() },
-    { id: appData.nextTxId++, productId: startId+3, type: 'IN', quantity: 50, unitCost: 8.90, totalCost: 445, avgCostAfter: 8.90, stockAfter: 50, date: twoDaysAgo, notes: 'Initial stock', by: 'admin', timestamp: new Date().toISOString() },
-    { id: appData.nextTxId++, productId: startId+3, type: 'OUT', quantity: 42, unitCost: 8.90, totalCost: 373.80, avgCostAfter: 8.90, stockAfter: 8, date: today, notes: 'Used in production', by: 'staff', timestamp: new Date().toISOString() },
-    { id: appData.nextTxId++, productId: startId+4, type: 'IN', quantity: 45, unitCost: 32.00, totalCost: 1440, avgCostAfter: 32.00, stockAfter: 45, date: yesterday, notes: 'Monthly supply', by: 'admin', timestamp: new Date().toISOString() },
-  ];
-
-  appData.transactions.push(...demoTx);
-  saveData(appData);
-  refreshAll();
-  showToast('Demo data loaded! 🎉');
+async function apiClearAll() {
+  if (!confirm('⚠️ Delete ALL products and transactions from Google Sheet?')) return;
+  if (!confirm('This CANNOT be undone. Are you sure?')) return;
+  try {
+    const result = await apiPost('clearAll', {});
+    if (result.success) {
+      showToast('All data cleared', 'warning');
+      await loadAllData();
+      refreshAllViews();
+    } else {
+      showToast(result.error || 'Failed', 'error');
+    }
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  }
 }
 
 // ============================================================
-//  UTILITY FUNCTIONS
+//  UTILITY
 // ============================================================
 function escHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
+  const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML;
 }
-
-function getDateStamp() {
-  return new Date().toISOString().split('T')[0].replace(/-/g, '');
-}
-
-function refreshAll() {
-  refreshDashboard();
-  renderProducts();
-  populateProductSelects();
-}
+function getDateStamp() { return new Date().toISOString().split('T')[0].replace(/-/g,''); }
 
 // ============================================================
-//  INITIALIZATION
+//  STARTUP
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-  initRole();
-
-  // Set default page based on role
-  if (USER_ROLE === 'staff') {
-    showPage('stockin');
+  if (!API_URL) {
+    // Show setup screen
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    document.getElementById('setupScreen').classList.remove('hidden');
   } else {
-    showPage('dashboard');
+    // Has API URL - proceed
+    document.getElementById('setupScreen').classList.add('hidden');
+    initApp();
   }
-
-  refreshAll();
 });
 </script>
-
 </body>
 </html>
