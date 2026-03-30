@@ -1,0 +1,27 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "sku": "Cola 320 ML",
+      "name": "Cola 320 ML",
+      "category": "Beverages",
+      "unit": "Unit",
+      "minStock": 10,
+      "quantity": 0,
+      "averageCost": 0
+    },
+    {
+      "id": 2,
+      "sku": "100 Plus 320ML",
+      "name": "100 Plus 320ML",
+      "category": "Beverages",
+      "unit": "Unit",
+      "minStock": 10,
+      "quantity": 0,
+      "averageCost": 0
+    }
+  ],
+  "transactions": [],
+  "nextProductId": 3,
+  "nextTxId": 1
+}
