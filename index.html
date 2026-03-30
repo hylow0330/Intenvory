@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InvenTrack - Inventory Management System</title>
+<title>InvenTrack</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -11,10 +11,9 @@
 :root{--sidebar-width:260px;--primary:#4361ee;--primary-dark:#3a56d4;--success:#2ec4b6;--danger:#e63946;--warning:#f77f00;--dark:#1a1a2e;--darker:#16162a;--light-bg:#f0f2f5;--card-bg:#fff;--text-primary:#1a1a2e;--text-secondary:#6c757d;--border-color:#e0e0e0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--light-bg);color:var(--text-primary);min-height:100vh}
-
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-width);height:100vh;background:linear-gradient(180deg,var(--dark),var(--darker));color:#fff;z-index:1000;transition:transform .3s;overflow-y:auto}
 .sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
-.sidebar-brand .logo{width:42px;height:42px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+.sidebar-brand .logo{width:42px;height:42px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
 .sidebar-brand h5{margin:0;font-size:16px;font-weight:600}
 .sidebar-brand small{color:rgba(255,255,255,.5);font-size:11px}
 .sidebar-nav{padding:16px 0}
@@ -24,8 +23,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .nav-item.active{background:rgba(67,97,238,.15);color:#fff;border-left-color:var(--primary)}
 .nav-item i{font-size:18px;width:22px;text-align:center}
 .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
-
-.main-content{margin-left:var(--sidebar-width);min-height:100vh;transition:margin-left .3s}
+.main-content{margin-left:var(--sidebar-width);min-height:100vh}
 .top-header{background:var(--card-bg);padding:16px 30px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .top-header h4{margin:0;font-weight:700;font-size:20px}
 .role-badge{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600}
@@ -33,59 +31,46 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .role-badge.staff{background:#fff3e0;color:#e65100}
 .menu-toggle{display:none;background:0 0;border:none;font-size:24px;cursor:pointer;color:var(--text-primary)}
 .page-content{padding:24px 30px}
-.page{display:none}
-.page.active{display:block;animation:fadeIn .3s ease}
-
+.page{display:none}.page.active{display:block;animation:fadeIn .3s ease}
 .stat-card{background:var(--card-bg);border-radius:14px;padding:22px;border:1px solid var(--border-color);transition:transform .2s,box-shadow .2s}
 .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.08)}
 .stat-card .icon-box{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
 .stat-card .stat-value{font-size:28px;font-weight:700;margin:8px 0 2px;line-height:1}
 .stat-card .stat-label{color:var(--text-secondary);font-size:13px}
-
 .content-card{background:var(--card-bg);border-radius:14px;border:1px solid var(--border-color);margin-bottom:24px}
-.content-card .card-header{padding:18px 22px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:0 0}
+.content-card .card-header{padding:18px 22px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:0 0;flex-wrap:wrap;gap:10px}
 .content-card .card-header h6{margin:0;font-weight:700;font-size:16px}
 .content-card .card-body{padding:22px}
-
 .data-table{width:100%;border-collapse:collapse;font-size:14px}
 .data-table thead th{background:#f8f9fa;padding:12px 16px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-secondary);border-bottom:2px solid var(--border-color);white-space:nowrap}
 .data-table tbody td{padding:12px 16px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 .data-table tbody tr:hover{background:#f8f9fb}
-.data-table tbody tr:last-child td{border-bottom:none}
-
 .badge-in{background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
 .badge-out{background:#fce4ec;color:#c62828;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
 .badge-low{background:#fff3e0;color:#e65100;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
 .badge-ok{background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
-
+.badge-active{background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-disabled{background:#fce4ec;color:#c62828;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-role-admin{background:#e3f2fd;color:#1565c0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-role-staff{background:#f3e5f5;color:#7b1fa2;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
 .btn-primary{background:var(--primary);border-color:var(--primary)}
 .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
 .btn-icon{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border-color);background:#fff;color:var(--text-secondary);cursor:pointer;transition:all .2s}
 .btn-icon:hover{background:#f8f9fa;color:var(--text-primary)}
 .btn-icon.danger:hover{background:#fce4ec;color:var(--danger);border-color:var(--danger)}
 .btn-icon.success:hover{background:#e8f5e9;color:#2e7d32;border-color:#2e7d32}
-
+.btn-icon.warning:hover{background:#fff3e0;color:#e65100;border-color:#e65100}
 .form-control,.form-select{border-radius:10px;border:1px solid var(--border-color);padding:10px 14px;font-size:14px}
 .form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,.15)}
-.form-label{font-weight:600;font-size:13px;margin-bottom:6px;color:var(--text-primary)}
-
+.form-label{font-weight:600;font-size:13px;margin-bottom:6px}
 .modal-content{border-radius:16px;border:none}
 .modal-header{border-bottom:1px solid var(--border-color);padding:20px 24px}
 .modal-body{padding:24px}
 .modal-footer{border-top:1px solid var(--border-color);padding:16px 24px}
 .modal-title{font-weight:700}
-
-.search-box{position:relative}
-.search-box input{padding-left:40px;border-radius:10px}
-.search-box i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-secondary)}
-
-.empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}
-.empty-state i{font-size:60px;opacity:.3}
-.empty-state h5{margin-top:16px;color:var(--text-primary)}
-
-.link-display{background:#f8f9fa;border:1px dashed var(--border-color);border-radius:10px;padding:12px 16px;font-family:monospace;font-size:13px;word-break:break-all}
-
-/* Sync bar */
+.search-box{position:relative}.search-box input{padding-left:40px}.search-box i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-secondary)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}.empty-state i{font-size:60px;opacity:.3}.empty-state h5{margin-top:16px;color:var(--text-primary)}
+.link-display{background:#f8f9fa;border:1px dashed var(--border-color);border-radius:10px;padding:12px 16px;font-family:monospace;font-size:11px;word-break:break-all;user-select:all}
 .sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary)}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#ccc}
 .sync-dot.online{background:#4caf50;box-shadow:0 0 6px #4caf50}
@@ -93,133 +78,128 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .sync-dot.error{background:#f44336}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Loading overlay */
-.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s}
-.loading-overlay.hidden{opacity:0;pointer-events:none}
+/* Screens */
+.full-screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px}
+.full-screen.hidden{display:none}
+.setup-screen{background:linear-gradient(135deg,#667eea,#764ba2);z-index:10001}
+.login-screen{background:linear-gradient(135deg,#1a1a2e,#16213e);z-index:10000}
+.screen-card{background:#fff;border-radius:20px;padding:40px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.screen-card h2{font-weight:700;text-align:center;margin-bottom:4px}
+.screen-card .subtitle{color:var(--text-secondary);text-align:center;margin-bottom:24px;font-size:14px}
+.screen-error{color:var(--danger);font-size:13px;margin-top:10px;display:none}
+.screen-success{color:#2e7d32;font-size:13px;margin-top:10px;display:none}
+
+.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.loading-overlay.hidden{opacity:0;pointer-events:none;transition:opacity .3s}
 .spinner-ring{width:50px;height:50px;border:4px solid #e0e0e0;border-top:4px solid var(--primary);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-overlay p{margin-top:16px;color:var(--text-secondary);font-size:14px}
 
-/* Setup screen */
-.setup-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2);z-index:10000;display:flex;align-items:center;justify-content:center}
-.setup-screen.hidden{display:none}
-.setup-card{background:#fff;border-radius:20px;padding:40px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.setup-card h2{font-weight:700;margin-bottom:6px}
-.setup-card .subtitle{color:var(--text-secondary);margin-bottom:24px;font-size:14px}
-.setup-steps{background:#f8f9fa;border-radius:12px;padding:16px 20px;margin-bottom:20px;font-size:13px;line-height:1.8}
-.setup-steps ol{padding-left:18px;margin:0}
-.setup-error{color:var(--danger);font-size:13px;margin-top:8px;display:none}
-.setup-success{color:#2e7d32;font-size:13px;margin-top:8px;display:none}
-
-/* Button loading */
 .btn-loading{position:relative;pointer-events:none;opacity:.7}
-.btn-loading::after{content:'';position:absolute;width:16px;height:16px;border:2px solid transparent;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;right:12px;top:50%;margin-top:-8px}
+.btn-loading::after{content:'';position:absolute;width:16px;height:16px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;right:12px;top:50%;margin-top:-8px}
 
-/* Toast */
-.toast-container{position:fixed;top:20px;right:20px;z-index:9999}
-.custom-toast{background:var(--card-bg);border-radius:12px;padding:14px 20px;margin-bottom:10px;box-shadow:0 10px 40px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;min-width:280px;border-left:4px solid var(--primary)}
-.custom-toast.success{border-left-color:var(--success)}
-.custom-toast.error{border-left-color:var(--danger)}
-.custom-toast.warning{border-left-color:var(--warning)}
+.toast-container{position:fixed;top:20px;right:20px;z-index:99999}
+.custom-toast{background:var(--card-bg);border-radius:12px;padding:14px 20px;margin-bottom:10px;box-shadow:0 10px 40px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;min-width:280px;max-width:400px}
+.custom-toast.success{border-left:4px solid var(--success)}
+.custom-toast.error{border-left:4px solid var(--danger)}
+.custom-toast.warning{border-left:4px solid var(--warning)}
 @keyframes slideIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:999}.sidebar-overlay.show{display:block}
 
-.sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:999}
-.sidebar-overlay.show{display:block}
+/* User avatar */
+.user-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;cursor:pointer}
+.user-dropdown{position:relative;display:inline-block}
+.user-menu{position:absolute;right:0;top:100%;margin-top:8px;background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.15);min-width:200px;z-index:200;display:none;border:1px solid var(--border-color);overflow:hidden}
+.user-menu.show{display:block}
+.user-menu-header{padding:14px 16px;border-bottom:1px solid var(--border-color);background:#f8f9fa}
+.user-menu-header strong{font-size:14px}
+.user-menu-header small{color:var(--text-secondary);font-size:11px}
+.user-menu-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background .2s;text-decoration:none;border:none;background:none;width:100%}
+.user-menu-item:hover{background:#f0f2f5}
+.user-menu-item.danger{color:var(--danger)}
+.user-menu-item.danger:hover{background:#fce4ec}
 
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.show{transform:translateX(0)}
-  .main-content{margin-left:0}
-  .menu-toggle{display:block}
-  .page-content{padding:16px}
-  .top-header{padding:12px 16px}
+  .sidebar{transform:translateX(-100%)}.sidebar.show{transform:translateX(0)}
+  .main-content{margin-left:0}.menu-toggle{display:block}
+  .page-content{padding:16px}.top-header{padding:12px 16px}
   .stat-card .stat-value{font-size:22px}
-}
-@media print{
-  .sidebar,.top-header,.no-print{display:none!important}
-  .main-content{margin-left:0!important}
 }
 </style>
 </head>
 <body>
 
-<!-- ==================== SETUP SCREEN ==================== -->
-<div class="setup-screen" id="setupScreen">
-  <div class="setup-card">
-    <div style="text-align:center;margin-bottom:20px;font-size:50px;">📦</div>
-    <h2 style="text-align:center;">InvenTrack Setup</h2>
-    <p class="subtitle" style="text-align:center;">Connect to Google Sheets to sync data across devices</p>
-    <div class="setup-steps">
-      <strong>Quick Setup:</strong>
-      <ol>
-        <li>Create a Google Sheet</li>
-        <li>Add the Apps Script code (see instructions)</li>
-        <li>Deploy as Web App → copy the URL</li>
-        <li>Paste the URL below</li>
-      </ol>
-    </div>
+<!-- ===== SETUP SCREEN ===== -->
+<div class="full-screen setup-screen" id="setupScreen">
+  <div class="screen-card">
+    <div style="text-align:center;font-size:50px;margin-bottom:8px;">📦</div>
+    <h2>InvenTrack Setup</h2>
+    <p class="subtitle">Connect to Google Sheets backend</p>
     <div class="mb-3">
       <label class="form-label">Google Apps Script Web App URL</label>
-      <input type="url" class="form-control" id="setupApiUrl"
-             placeholder="https://script.google.com/macros/s/xxx/exec">
+      <input type="url" class="form-control" id="setupApiUrl" placeholder="https://script.google.com/macros/s/.../exec">
     </div>
-    <button class="btn btn-primary w-100 py-2" id="setupConnectBtn" onclick="testAndConnect()">
-      <i class="bi bi-plug me-2"></i>Test Connection & Connect
-    </button>
-    <div class="setup-error" id="setupError"></div>
-    <div class="setup-success" id="setupSuccess"></div>
-    <hr style="margin:20px 0">
-    <p class="text-center text-muted" style="font-size:12px;">
-      Data will be stored in your Google Sheet and synced in real-time between admin & staff.
-    </p>
+    <button class="btn btn-primary w-100 py-2" id="setupBtn" onclick="doSetup()"><i class="bi bi-plug me-2"></i>Connect</button>
+    <div class="screen-error" id="setupError"></div>
+    <div class="screen-success" id="setupSuccess"></div>
   </div>
 </div>
 
-<!-- ==================== LOADING OVERLAY ==================== -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner-ring"></div>
-  <p id="loadingText">Connecting to Google Sheets...</p>
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="full-screen login-screen hidden" id="loginScreen">
+  <div class="screen-card">
+    <div style="text-align:center;font-size:50px;margin-bottom:8px;">🔐</div>
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Sign in to InvenTrack</p>
+    <form onsubmit="doLogin(event)">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" id="loginUser" required autocomplete="username">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" id="loginPass" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2" id="loginBtn"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</button>
+    </form>
+    <div class="screen-error" id="loginError"></div>
+    <div class="mt-3 text-center">
+      <button class="btn btn-link btn-sm text-muted" onclick="showSetup()" style="font-size:12px;">Change API Connection</button>
+    </div>
+  </div>
 </div>
 
-<!-- ==================== SIDEBAR ==================== -->
+<!-- ===== LOADING ===== -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="spinner-ring"></div>
+  <p id="loadingText">Loading...</p>
+</div>
+
+<!-- ===== SIDEBAR ===== -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="logo">📦</div>
-    <div><h5>InvenTrack</h5><small>Google Sheets Edition</small></div>
+    <div><h5>InvenTrack</h5><small>Inventory System</small></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Main</div>
-    <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
-      <i class="bi bi-grid-1x2-fill"></i> Dashboard
-    </a>
-    <a class="nav-item" data-page="products" onclick="showPage('products')">
-      <i class="bi bi-box-seam-fill"></i> Products
-      <span class="nav-badge" id="productCount">0</span>
-    </a>
+    <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+    <a class="nav-item" data-page="products" onclick="showPage('products')"><i class="bi bi-box-seam-fill"></i> Products <span class="nav-badge" id="productCount">0</span></a>
     <div class="nav-section">Operations</div>
-    <a class="nav-item" data-page="stockin" onclick="showPage('stockin')">
-      <i class="bi bi-plus-circle-fill"></i> Stock In
-    </a>
-    <a class="nav-item" data-page="stockout" onclick="showPage('stockout')">
-      <i class="bi bi-dash-circle-fill"></i> Stock Out
-    </a>
+    <a class="nav-item" data-page="stockin" onclick="showPage('stockin')"><i class="bi bi-plus-circle-fill"></i> Stock In</a>
+    <a class="nav-item" data-page="stockout" onclick="showPage('stockout')"><i class="bi bi-dash-circle-fill"></i> Stock Out</a>
     <div class="nav-section admin-only">Reports</div>
-    <a class="nav-item admin-only" data-page="transactions" onclick="showPage('transactions')">
-      <i class="bi bi-clock-history"></i> Transactions
-    </a>
-    <a class="nav-item admin-only" data-page="export" onclick="showPage('export')">
-      <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
-    </a>
+    <a class="nav-item admin-only" data-page="transactions" onclick="showPage('transactions')"><i class="bi bi-clock-history"></i> Transactions</a>
+    <a class="nav-item admin-only" data-page="export" onclick="showPage('export')"><i class="bi bi-file-earmark-excel-fill"></i> Export Excel</a>
     <div class="nav-section admin-only">Admin</div>
-    <a class="nav-item admin-only" data-page="settings" onclick="showPage('settings')">
-      <i class="bi bi-gear-fill"></i> Settings
-    </a>
+    <a class="nav-item admin-only" data-page="users" onclick="showPage('users')"><i class="bi bi-people-fill"></i> User Management</a>
+    <a class="nav-item admin-only" data-page="settings" onclick="showPage('settings')"><i class="bi bi-gear-fill"></i> Settings</a>
   </nav>
 </aside>
 
-<!-- ==================== MAIN CONTENT ==================== -->
+<!-- ===== MAIN ===== -->
 <div class="main-content">
   <header class="top-header">
     <div style="display:flex;align-items:center;gap:12px;">
@@ -229,1080 +209,843 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <div style="display:flex;align-items:center;gap:12px;">
       <div class="sync-bar">
         <div class="sync-dot" id="syncDot"></div>
-        <span id="syncText">Connecting...</span>
-        <button class="btn btn-sm btn-outline-secondary" style="padding:2px 8px;font-size:11px;" onclick="refreshData()" title="Refresh data">
-          <i class="bi bi-arrow-clockwise"></i>
-        </button>
+        <span id="syncText">--</span>
+        <button class="btn btn-sm btn-outline-secondary" style="padding:2px 8px;font-size:11px;" onclick="refreshData()"><i class="bi bi-arrow-clockwise"></i></button>
       </div>
-      <span class="role-badge admin" id="roleBadge"><i class="bi bi-shield-check"></i> Admin</span>
+      <!-- User dropdown -->
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-avatar" id="userAvatar" style="background:var(--primary);" onclick="toggleUserMenu()">A</div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <strong id="menuName">Admin</strong><br>
+            <small id="menuRole">Administrator</small>
+          </div>
+          <button class="user-menu-item" onclick="openChangePasswordModal()"><i class="bi bi-key"></i> Change Password</button>
+          <button class="user-menu-item danger" onclick="doLogout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+        </div>
+      </div>
     </div>
   </header>
 
   <div class="page-content">
 
-    <!-- ========== DASHBOARD ========== -->
+    <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="row g-3 mb-4">
-        <div class="col-6 col-lg-3">
-          <div class="stat-card">
-            <div class="icon-box" style="background:#eef2ff;color:var(--primary);"><i class="bi bi-box-seam-fill"></i></div>
-            <div class="stat-value" id="statProducts">0</div>
-            <div class="stat-label">Total Products</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-card">
-            <div class="icon-box" style="background:#e8f5e9;color:#2e7d32;"><i class="bi bi-stack"></i></div>
-            <div class="stat-value" id="statTotalQty">0</div>
-            <div class="stat-label">Total Quantity</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-card">
-            <div class="icon-box" style="background:#fff3e0;color:#e65100;"><i class="bi bi-cash-stack"></i></div>
-            <div class="stat-value" id="statTotalValue">$0</div>
-            <div class="stat-label">Total Value</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-card">
-            <div class="icon-box" style="background:#fce4ec;color:#c62828;"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <div class="stat-value" id="statLowStock">0</div>
-            <div class="stat-label">Low Stock Items</div>
-          </div>
-        </div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#eef2ff;color:var(--primary);"><i class="bi bi-box-seam-fill"></i></div><div class="stat-value" id="statProducts">0</div><div class="stat-label">Products</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#e8f5e9;color:#2e7d32;"><i class="bi bi-stack"></i></div><div class="stat-value" id="statTotalQty">0</div><div class="stat-label">Total Qty</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#fff3e0;color:#e65100;"><i class="bi bi-cash-stack"></i></div><div class="stat-value" id="statTotalValue">$0</div><div class="stat-label">Total Value</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#fce4ec;color:#c62828;"><i class="bi bi-exclamation-triangle-fill"></i></div><div class="stat-value" id="statLowStock">0</div><div class="stat-label">Low Stock</div></div></div>
       </div>
       <div class="row g-4">
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-exclamation-triangle text-warning me-2"></i>Low Stock Alerts</h6></div>
-            <div class="card-body" id="lowStockList"><div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All stock levels are healthy</p></div></div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-clock-history text-primary me-2"></i>Recent Transactions</h6></div>
-            <div class="card-body p-0">
-              <div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Cost</th></tr></thead><tbody id="recentTransBody"><tr><td colspan="5" class="text-center text-muted py-4">No transactions yet</td></tr></tbody></table></div>
-            </div>
-          </div>
-        </div>
+        <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-exclamation-triangle text-warning me-2"></i>Low Stock</h6></div><div class="card-body" id="lowStockList"></div></div></div>
+        <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-clock-history text-primary me-2"></i>Recent</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>By</th></tr></thead><tbody id="recentTransBody"></tbody></table></div></div></div></div>
       </div>
     </div>
 
-    <!-- ========== PRODUCTS ========== -->
+    <!-- PRODUCTS -->
     <div class="page" id="page-products">
-      <div class="content-card">
-        <div class="card-header">
-          <div class="search-box" style="width:300px;"><i class="bi bi-search"></i><input type="text" class="form-control" placeholder="Search products..." id="productSearch" oninput="renderProducts()"></div>
-          <button class="btn btn-primary btn-sm" id="addProductBtn" onclick="openProductModal()"><i class="bi bi-plus-lg me-1"></i> Add Product</button>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive"><table class="data-table"><thead><tr><th>SKU</th><th>Product Name</th><th>Category</th><th>Quantity</th><th>Avg Cost</th><th>Total Value</th><th>Status</th><th>Actions</th></tr></thead><tbody id="productsTableBody"></tbody></table></div>
-        </div>
-      </div>
+      <div class="content-card"><div class="card-header">
+        <div class="search-box" style="width:280px;"><i class="bi bi-search"></i><input type="text" class="form-control" placeholder="Search..." id="productSearch" oninput="renderProducts()"></div>
+        <button class="btn btn-primary btn-sm admin-only" id="addProductBtn" onclick="openProductModal()"><i class="bi bi-plus-lg me-1"></i>Add Product</button>
+      </div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Qty</th><th>Avg Cost</th><th>Value</th><th>Status</th><th class="admin-only">Actions</th></tr></thead><tbody id="productsTableBody"></tbody></table></div></div></div>
     </div>
 
-    <!-- ========== STOCK IN ========== -->
+    <!-- STOCK IN -->
     <div class="page" id="page-stockin">
-      <div class="row g-4">
-        <div class="col-lg-7">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-plus-circle text-success me-2"></i>Stock In Entry</h6></div>
-            <div class="card-body">
-              <form id="stockInForm" onsubmit="processStockIn(event)">
-                <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="siProduct" required onchange="updateStockInInfo()"><option value="">-- Select Product --</option></select></div>
-                <div class="row g-3 mb-3">
-                  <div class="col-6"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="siQuantity" min="1" required oninput="calcStockInTotal()"></div>
-                  <div class="col-6"><label class="form-label">Unit Cost ($) *</label><input type="number" class="form-control" id="siUnitCost" min="0" step="0.01" required oninput="calcStockInTotal()"></div>
-                </div>
-                <div class="mb-3"><label class="form-label">Total Cost</label><input type="text" class="form-control" id="siTotalCost" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
-                <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="siDate"></div>
-                <div class="mb-3"><label class="form-label">Supplier / Notes</label><input type="text" class="form-control" id="siNotes" placeholder="Optional notes..."></div>
-                <button type="submit" class="btn btn-success w-100 py-2" id="btnStockIn"><i class="bi bi-plus-circle me-2"></i>Confirm Stock In</button>
-              </form>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-5">
-          <div class="content-card">
-            <div class="card-header"><h6>Current Stock Info</h6></div>
-            <div class="card-body" id="siInfoPanel"><div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product to see current info</p></div></div>
-          </div>
-        </div>
-      </div>
+      <div class="row g-4"><div class="col-lg-7"><div class="content-card"><div class="card-header"><h6><i class="bi bi-plus-circle text-success me-2"></i>Stock In</h6></div><div class="card-body">
+        <form id="stockInForm" onsubmit="processStockIn(event)">
+          <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="siProduct" required onchange="updateSIInfo()"><option value="">-- Select --</option></select></div>
+          <div class="row g-3 mb-3"><div class="col-6"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="siQty" min="1" required oninput="calcSI()"></div><div class="col-6"><label class="form-label">Unit Cost ($) *</label><input type="number" class="form-control" id="siCost" min="0" step="0.01" required oninput="calcSI()"></div></div>
+          <div class="mb-3"><label class="form-label">Total Cost</label><input type="text" class="form-control" id="siTotal" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
+          <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="siDate"></div>
+          <div class="mb-3"><label class="form-label">Notes</label><input type="text" class="form-control" id="siNotes" placeholder="Optional..."></div>
+          <button type="submit" class="btn btn-success w-100 py-2" id="btnSI"><i class="bi bi-plus-circle me-2"></i>Confirm Stock In</button>
+        </form>
+      </div></div></div>
+      <div class="col-lg-5"><div class="content-card"><div class="card-header"><h6>Stock Info</h6></div><div class="card-body" id="siInfo"></div></div></div></div>
     </div>
 
-    <!-- ========== STOCK OUT ========== -->
+    <!-- STOCK OUT -->
     <div class="page" id="page-stockout">
-      <div class="row g-4">
-        <div class="col-lg-7">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-dash-circle text-danger me-2"></i>Stock Out Entry</h6></div>
-            <div class="card-body">
-              <form id="stockOutForm" onsubmit="processStockOut(event)">
-                <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="soProduct" required onchange="updateStockOutInfo()"><option value="">-- Select Product --</option></select></div>
-                <div class="mb-3"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="soQuantity" min="1" required oninput="calcStockOutTotal()"></div>
-                <div class="mb-3"><label class="form-label">Cost Out (based on Avg Cost)</label><input type="text" class="form-control" id="soTotalCost" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
-                <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="soDate"></div>
-                <div class="mb-3"><label class="form-label">Reason / Notes</label><input type="text" class="form-control" id="soNotes" placeholder="e.g. Sold, Damaged, etc."></div>
-                <button type="submit" class="btn btn-danger w-100 py-2" id="btnStockOut"><i class="bi bi-dash-circle me-2"></i>Confirm Stock Out</button>
-              </form>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-5">
-          <div class="content-card">
-            <div class="card-header"><h6>Current Stock Info</h6></div>
-            <div class="card-body" id="soInfoPanel"><div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product to see current info</p></div></div>
-          </div>
-        </div>
-      </div>
+      <div class="row g-4"><div class="col-lg-7"><div class="content-card"><div class="card-header"><h6><i class="bi bi-dash-circle text-danger me-2"></i>Stock Out</h6></div><div class="card-body">
+        <form id="stockOutForm" onsubmit="processStockOut(event)">
+          <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="soProduct" required onchange="updateSOInfo()"><option value="">-- Select --</option></select></div>
+          <div class="mb-3"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="soQty" min="1" required oninput="calcSO()"></div>
+          <div class="mb-3"><label class="form-label">Cost Out</label><input type="text" class="form-control" id="soTotal" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
+          <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="soDate"></div>
+          <div class="mb-3"><label class="form-label">Notes</label><input type="text" class="form-control" id="soNotes" placeholder="e.g. Sold, Damaged..."></div>
+          <button type="submit" class="btn btn-danger w-100 py-2" id="btnSO"><i class="bi bi-dash-circle me-2"></i>Confirm Stock Out</button>
+        </form>
+      </div></div></div>
+      <div class="col-lg-5"><div class="content-card"><div class="card-header"><h6>Stock Info</h6></div><div class="card-body" id="soInfo"></div></div></div></div>
     </div>
 
-    <!-- ========== TRANSACTIONS ========== -->
+    <!-- TRANSACTIONS -->
     <div class="page" id="page-transactions">
-      <div class="content-card">
-        <div class="card-header" style="flex-wrap:wrap;gap:10px;">
-          <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Transaction History</h6>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <select class="form-select form-select-sm" style="width:140px;" id="txFilterType" onchange="renderTransactions()"><option value="">All Types</option><option value="IN">Stock In</option><option value="OUT">Stock Out</option></select>
-            <select class="form-select form-select-sm" style="width:180px;" id="txFilterProduct" onchange="renderTransactions()"><option value="">All Products</option></select>
-            <input type="date" class="form-control form-control-sm" style="width:150px;" id="txFilterFrom" onchange="renderTransactions()">
-            <input type="date" class="form-control form-control-sm" style="width:150px;" id="txFilterTo" onchange="renderTransactions()">
-            <button class="btn btn-outline-secondary btn-sm" onclick="clearTxFilters()"><i class="bi bi-x-circle"></i> Clear</button>
-          </div>
+      <div class="content-card"><div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Transactions</h6>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select class="form-select form-select-sm" style="width:120px;" id="txFType" onchange="renderTx()"><option value="">All</option><option value="IN">In</option><option value="OUT">Out</option></select>
+          <select class="form-select form-select-sm" style="width:160px;" id="txFProd" onchange="renderTx()"><option value="">All Products</option></select>
+          <input type="date" class="form-control form-control-sm" style="width:140px;" id="txFFrom" onchange="renderTx()">
+          <input type="date" class="form-control form-control-sm" style="width:140px;" id="txFTo" onchange="renderTx()">
+          <button class="btn btn-outline-secondary btn-sm" onclick="clearTxF()"><i class="bi bi-x-circle"></i></button>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive"><table class="data-table"><thead><tr><th>#</th><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Unit Cost</th><th>Total Cost</th><th>Avg Cost After</th><th>Notes</th><th>By</th></tr></thead><tbody id="transactionsTableBody"></tbody></table></div>
-        </div>
-      </div>
+      </div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>#</th><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th>Avg After</th><th>Notes</th><th>By</th></tr></thead><tbody id="txBody"></tbody></table></div></div></div>
     </div>
 
-    <!-- ========== EXPORT ========== -->
+    <!-- EXPORT -->
     <div class="page" id="page-export">
       <div class="row g-4">
-        <div class="col-lg-4">
-          <div class="content-card"><div class="card-body text-center py-5">
-            <i class="bi bi-file-earmark-spreadsheet" style="font-size:50px;color:var(--success);"></i>
-            <h5 class="mt-3">Products List</h5>
-            <p class="text-muted small">Export all products with stock levels and average costs</p>
-            <button class="btn btn-success" onclick="exportProducts()"><i class="bi bi-download me-2"></i>Export Products</button>
-          </div></div>
-        </div>
-        <div class="col-lg-4">
-          <div class="content-card"><div class="card-body text-center py-5">
-            <i class="bi bi-file-earmark-bar-graph" style="font-size:50px;color:var(--primary);"></i>
-            <h5 class="mt-3">Transactions</h5>
-            <p class="text-muted small">Export all transaction history with costs</p>
-            <button class="btn btn-primary" onclick="exportTransactions()"><i class="bi bi-download me-2"></i>Export Transactions</button>
-          </div></div>
-        </div>
-        <div class="col-lg-4">
-          <div class="content-card"><div class="card-body text-center py-5">
-            <i class="bi bi-file-earmark-ruled" style="font-size:50px;color:var(--warning);"></i>
-            <h5 class="mt-3">Full Report</h5>
-            <p class="text-muted small">Summary + Products + Transactions in one file</p>
-            <button class="btn btn-warning text-white" onclick="exportFullReport()"><i class="bi bi-download me-2"></i>Export Full Report</button>
-          </div></div>
-        </div>
+        <div class="col-lg-4"><div class="content-card"><div class="card-body text-center py-5"><i class="bi bi-file-earmark-spreadsheet" style="font-size:50px;color:var(--success);"></i><h5 class="mt-3">Products</h5><button class="btn btn-success mt-2" onclick="exportProducts()"><i class="bi bi-download me-2"></i>Export</button></div></div></div>
+        <div class="col-lg-4"><div class="content-card"><div class="card-body text-center py-5"><i class="bi bi-file-earmark-bar-graph" style="font-size:50px;color:var(--primary);"></i><h5 class="mt-3">Transactions</h5><button class="btn btn-primary mt-2" onclick="exportTx()"><i class="bi bi-download me-2"></i>Export</button></div></div></div>
+        <div class="col-lg-4"><div class="content-card"><div class="card-body text-center py-5"><i class="bi bi-file-earmark-ruled" style="font-size:50px;color:var(--warning);"></i><h5 class="mt-3">Full Report</h5><button class="btn btn-warning text-white mt-2" onclick="exportFull()"><i class="bi bi-download me-2"></i>Export</button></div></div></div>
       </div>
     </div>
 
-    <!-- ========== SETTINGS ========== -->
+    <!-- USER MANAGEMENT -->
+    <div class="page" id="page-users">
+      <div class="content-card"><div class="card-header">
+        <h6><i class="bi bi-people-fill me-2"></i>User Management</h6>
+        <button class="btn btn-primary btn-sm" onclick="openUserModal()"><i class="bi bi-person-plus me-1"></i>Add User</button>
+      </div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div></div></div>
+    </div>
+
+    <!-- SETTINGS -->
     <div class="page" id="page-settings">
       <div class="row g-4">
-        <!-- Connection -->
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-plug me-2"></i>Google Sheets Connection</h6></div>
-            <div class="card-body">
-              <p class="text-muted small">Currently connected to:</p>
-              <div class="link-display mb-3" id="currentApiUrl" style="font-size:11px;"></div>
-              <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm" onclick="changeApiUrl()"><i class="bi bi-pencil me-1"></i>Change URL</button>
-                <button class="btn btn-outline-success btn-sm" onclick="testCurrentConnection()"><i class="bi bi-check-circle me-1"></i>Test Connection</button>
-              </div>
-              <hr>
-              <p class="text-muted small mb-2"><i class="bi bi-google me-1"></i>Open Google Sheet:</p>
-              <a href="#" id="sheetLink" target="_blank" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-box-arrow-up-right me-1"></i>Open Spreadsheet
-              </a>
-            </div>
+        <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-plug me-2"></i>Connection</h6></div><div class="card-body">
+          <p class="text-muted small">API URL:</p><div class="link-display mb-3" id="dispApi"></div>
+          <button class="btn btn-outline-success btn-sm" onclick="testConn()"><i class="bi bi-check-circle me-1"></i>Test</button>
+        </div></div></div>
+        <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-link-45deg me-2"></i>Staff Access</h6></div><div class="card-body">
+          <p class="text-muted small">Share this link + login credentials to staff:</p>
+          <div class="link-display mb-3" id="staffLink"></div>
+          <button class="btn btn-primary btn-sm" onclick="copyLink()"><i class="bi bi-clipboard me-1"></i>Copy</button>
+        </div></div></div>
+        <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-database me-2"></i>Data</h6></div><div class="card-body">
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-secondary btn-sm" onclick="apiLoadDemo()"><i class="bi bi-magic me-1"></i>Load Demo</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="apiClearAll()"><i class="bi bi-trash me-1"></i>Clear All</button>
           </div>
-        </div>
-
-        <!-- Staff Link -->
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-link-45deg me-2"></i>Staff Link</h6></div>
-            <div class="card-body">
-              <p class="text-muted small">Share this link. Staff can only Stock In / Stock Out:</p>
-              <div class="link-display mb-3" id="staffLink" style="font-size:11px;"></div>
-              <button class="btn btn-primary btn-sm" onclick="copyStaffLink()"><i class="bi bi-clipboard me-1"></i>Copy Link</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Data Management -->
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-database me-2"></i>Data Management</h6></div>
-            <div class="card-body">
-              <p class="text-muted small mb-3">Data is stored in Google Sheets. These actions modify the sheet directly.</p>
-              <div class="d-flex gap-2 flex-wrap">
-                <button class="btn btn-outline-secondary btn-sm" onclick="apiLoadDemo()"><i class="bi bi-magic me-1"></i>Load Demo Data</button>
-                <button class="btn btn-outline-danger btn-sm" onclick="apiClearAll()"><i class="bi bi-trash me-1"></i>Clear All Data</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Auto Refresh -->
-        <div class="col-lg-6">
-          <div class="content-card">
-            <div class="card-header"><h6><i class="bi bi-arrow-repeat me-2"></i>Auto Refresh</h6></div>
-            <div class="card-body">
-              <p class="text-muted small mb-3">Auto-refresh interval to sync data from Google Sheets:</p>
-              <select class="form-select form-select-sm" style="width:200px;" id="refreshInterval" onchange="setRefreshInterval()">
-                <option value="0">Manual only</option>
-                <option value="15">Every 15 seconds</option>
-                <option value="30" selected>Every 30 seconds</option>
-                <option value="60">Every 60 seconds</option>
-                <option value="120">Every 2 minutes</option>
-              </select>
-              <div class="mt-2 small text-muted" id="lastRefreshTime">Last refresh: --</div>
-            </div>
-          </div>
-        </div>
+        </div></div></div>
+        <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-arrow-repeat me-2"></i>Auto Refresh</h6></div><div class="card-body">
+          <select class="form-select form-select-sm" style="width:200px;" id="refreshInterval" onchange="setRefresh()">
+            <option value="0">Manual only</option><option value="30">Every 30s</option><option value="60" selected>Every 60s</option><option value="120">Every 2min</option>
+          </select>
+          <div class="mt-2 small text-muted" id="lastRefresh">--</div>
+        </div></div></div>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- ========== PRODUCT MODAL ========== -->
-<div class="modal fade" id="productModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="productModalTitle">Add New Product</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form id="productForm" onsubmit="saveProduct(event)">
-        <div class="modal-body">
-          <input type="hidden" id="pEditId">
-          <div class="mb-3"><label class="form-label">SKU / Code *</label><input type="text" class="form-control" id="pSku" required placeholder="e.g. PRD-001"></div>
-          <div class="mb-3"><label class="form-label">Product Name *</label><input type="text" class="form-control" id="pName" required placeholder="e.g. Widget A"></div>
-          <div class="mb-3"><label class="form-label">Category</label><input type="text" class="form-control" id="pCategory" placeholder="e.g. Electronics"></div>
-          <div class="row g-3">
-            <div class="col-6"><label class="form-label">Unit</label><input type="text" class="form-control" id="pUnit" placeholder="e.g. pcs, kg" value="pcs"></div>
-            <div class="col-6"><label class="form-label">Min Stock Level</label><input type="number" class="form-control" id="pMinStock" min="0" value="10"></div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="btnSaveProduct"><i class="bi bi-check-lg me-1"></i>Save Product</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+<!-- PRODUCT MODAL -->
+<div class="modal fade" id="productModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title" id="pmTitle">Add Product</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form id="productForm" onsubmit="saveProduct(event)"><div class="modal-body">
+    <input type="hidden" id="pEditId">
+    <div class="mb-3"><label class="form-label">SKU *</label><input type="text" class="form-control" id="pSku" required></div>
+    <div class="mb-3"><label class="form-label">Name *</label><input type="text" class="form-control" id="pName" required></div>
+    <div class="mb-3"><label class="form-label">Category</label><input type="text" class="form-control" id="pCat"></div>
+    <div class="row g-3"><div class="col-6"><label class="form-label">Unit</label><input type="text" class="form-control" id="pUnit" value="pcs"></div><div class="col-6"><label class="form-label">Min Stock</label><input type="number" class="form-control" id="pMin" value="10" min="0"></div></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" id="btnSaveP">Save</button></div></form>
+</div></div></div>
+
+<!-- USER MODAL -->
+<div class="modal fade" id="userModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Add User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form id="userForm" onsubmit="saveUser(event)"><div class="modal-body">
+    <div class="mb-3"><label class="form-label">Username *</label><input type="text" class="form-control" id="uUsername" required placeholder="lowercase, no spaces" pattern="[a-z0-9_]+" minlength="3"></div>
+    <div class="mb-3"><label class="form-label">Display Name</label><input type="text" class="form-control" id="uDisplayName" placeholder="e.g. John Doe"></div>
+    <div class="mb-3"><label class="form-label">Password *</label><input type="password" class="form-control" id="uPassword" required minlength="4"></div>
+    <div class="mb-3"><label class="form-label">Confirm Password *</label><input type="password" class="form-control" id="uPassword2" required minlength="4"></div>
+    <div class="mb-3"><label class="form-label">Role</label><select class="form-select" id="uRole"><option value="staff">Staff</option><option value="admin">Admin</option></select></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" id="btnSaveU">Create User</button></div></form>
+</div></div></div>
+
+<!-- RESET PASSWORD MODAL -->
+<div class="modal fade" id="resetPwModal" tabindex="-1"><div class="modal-dialog modal-sm"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Reset Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form onsubmit="doResetPw(event)"><div class="modal-body">
+    <input type="hidden" id="rpUserId">
+    <p class="small text-muted">Reset password for: <strong id="rpUsername"></strong></p>
+    <div class="mb-3"><label class="form-label">New Password *</label><input type="password" class="form-control" id="rpNewPass" required minlength="4"></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-warning" id="btnResetPw">Reset</button></div></form>
+</div></div></div>
+
+<!-- CHANGE OWN PASSWORD MODAL -->
+<div class="modal fade" id="changePwModal" tabindex="-1"><div class="modal-dialog modal-sm"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Change Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form onsubmit="doChangePw(event)"><div class="modal-body">
+    <div class="mb-3"><label class="form-label">Current Password *</label><input type="password" class="form-control" id="cpOldPass" required></div>
+    <div class="mb-3"><label class="form-label">New Password *</label><input type="password" class="form-control" id="cpNewPass" required minlength="4"></div>
+    <div class="mb-3"><label class="form-label">Confirm New *</label><input type="password" class="form-control" id="cpNewPass2" required minlength="4"></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" id="btnChangePw">Change</button></div></form>
+</div></div></div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ============================================================
-//  CONFIGURATION
+//  STATE
 // ============================================================
-const urlParams = new URLSearchParams(window.location.search);
-const USER_ROLE = urlParams.get('role') === 'staff' ? 'staff' : 'admin';
-
-// API URL: check URL param first (for staff link), then localStorage
-let API_URL = '';
-const urlApiParam = urlParams.get('api');
-if (urlApiParam) {
-  try { API_URL = atob(urlApiParam); localStorage.setItem('inventrackApiUrl', API_URL); }
-  catch(e) { console.error('Invalid api param'); }
-}
-if (!API_URL) {
-  API_URL = localStorage.getItem('inventrackApiUrl') || '';
-}
-
-// App data cache
-let appData = { products: [], transactions: [] };
+let API_URL = localStorage.getItem('invApiUrl') || '';
+let SESSION = JSON.parse(localStorage.getItem('invSession') || 'null'); // {token, user:{id,username,role,displayName}}
+let appData = { products:[], transactions:[] };
+let usersData = [];
 let refreshTimer = null;
+
+// Check URL params for API
+const urlP = new URLSearchParams(location.search);
+if (urlP.get('api')) {
+  try { API_URL = atob(urlP.get('api')); localStorage.setItem('invApiUrl', API_URL); } catch(e){}
+}
 
 // ============================================================
 //  API LAYER
 // ============================================================
-async function apiGet(action) {
-  const url = API_URL + '?action=' + encodeURIComponent(action) + '&t=' + Date.now();
-  const resp = await fetch(url, { redirect: 'follow' });
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  return await resp.json();
+async function apiGet(action, extraParams='') {
+  const t = SESSION ? SESSION.token : '';
+  const url = `${API_URL}?action=${action}&token=${encodeURIComponent(t)}&t=${Date.now()}${extraParams}`;
+  const r = await fetch(url, {redirect:'follow'});
+  const j = await r.json();
+  if (j.error === 'AUTH_FAILED') { sessionExpired(); throw new Error('Session expired'); }
+  return j;
 }
 
-async function apiPost(action, data) {
-  const resp = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action, data }),
-    redirect: 'follow'
+async function apiPost(action, data={}) {
+  const r = await fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action, data, token: SESSION ? SESSION.token : '' }),
+    redirect:'follow'
   });
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  return await resp.json();
+  const j = await r.json();
+  if (j.error === 'AUTH_FAILED') { sessionExpired(); throw new Error('Session expired'); }
+  return j;
 }
 
-async function loadAllData() {
-  setSyncStatus('loading', 'Syncing...');
-  try {
-    const result = await apiGet('getAll');
-    if (result.success) {
-      appData = { products: result.products || [], transactions: result.transactions || [] };
-      setSyncStatus('online', 'Synced');
-      document.getElementById('lastRefreshTime').textContent =
-        'Last refresh: ' + new Date().toLocaleTimeString();
-    } else {
-      throw new Error(result.error || 'Failed to load');
-    }
-  } catch(err) {
-    console.error('Load error:', err);
-    setSyncStatus('error', 'Sync failed');
-    throw err;
-  }
-}
-
-async function refreshData() {
-  try {
-    await loadAllData();
-    refreshAllViews();
-    showToast('Data refreshed', 'success');
-  } catch(err) {
-    showToast('Failed to refresh: ' + err.message, 'error');
-  }
-}
-
-function setSyncStatus(status, text) {
-  const dot = document.getElementById('syncDot');
-  const txt = document.getElementById('syncText');
-  dot.className = 'sync-dot ' + status;
-  txt.textContent = text;
+function sessionExpired() {
+  SESSION = null;
+  localStorage.removeItem('invSession');
+  showLogin();
+  showToast('Session expired. Please login again.', 'warning');
 }
 
 // ============================================================
 //  SETUP SCREEN
 // ============================================================
-async function testAndConnect() {
+async function doSetup() {
   const url = document.getElementById('setupApiUrl').value.trim();
-  const btn = document.getElementById('setupConnectBtn');
-  const errEl = document.getElementById('setupError');
-  const sucEl = document.getElementById('setupSuccess');
+  const btn = document.getElementById('setupBtn');
+  const err = document.getElementById('setupError');
+  const suc = document.getElementById('setupSuccess');
+  err.style.display='none'; suc.style.display='none';
 
-  errEl.style.display = 'none';
-  sucEl.style.display = 'none';
-
-  if (!url) { errEl.textContent = 'Please enter a URL'; errEl.style.display = 'block'; return; }
-  if (!url.startsWith('https://script.google.com/')) {
-    errEl.textContent = 'URL should start with https://script.google.com/';
-    errEl.style.display = 'block'; return;
-  }
-
-  btn.classList.add('btn-loading');
-  btn.disabled = true;
-
+  if (!url || !url.includes('script.google.com')) { err.textContent='Enter valid Apps Script URL'; err.style.display='block'; return; }
+  btn.classList.add('btn-loading'); btn.disabled=true;
   try {
-    const resp = await fetch(url + '?action=ping&t=' + Date.now(), { redirect: 'follow' });
-    const result = await resp.json();
-    if (result.success) {
-      sucEl.textContent = '✅ ' + result.message;
-      sucEl.style.display = 'block';
-
-      // Save and proceed
-      API_URL = url;
-      localStorage.setItem('inventrackApiUrl', url);
-
-      setTimeout(async () => {
-        document.getElementById('setupScreen').classList.add('hidden');
-        await initApp();
-      }, 1000);
-    } else {
-      throw new Error(result.error || 'Connection failed');
-    }
-  } catch(err) {
-    errEl.textContent = '❌ Connection failed: ' + err.message;
-    errEl.style.display = 'block';
-  } finally {
-    btn.classList.remove('btn-loading');
-    btn.disabled = false;
-  }
+    const r = await fetch(url+'?action=ping&t='+Date.now(), {redirect:'follow'});
+    const j = await r.json();
+    if (j.success) {
+      suc.textContent='✅ '+j.message; suc.style.display='block';
+      API_URL = url; localStorage.setItem('invApiUrl', url);
+      setTimeout(() => showLogin(), 800);
+    } else throw new Error(j.error || 'Failed');
+  } catch(e) { err.textContent='❌ '+e.message; err.style.display='block'; }
+  finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
 }
 
-async function testCurrentConnection() {
-  try {
-    setSyncStatus('loading', 'Testing...');
-    const result = await apiGet('ping');
-    if (result.success) {
-      showToast('✅ Connection OK: ' + result.message);
-      setSyncStatus('online', 'Connected');
-    } else {
-      throw new Error(result.error);
-    }
-  } catch(err) {
-    showToast('❌ Connection failed: ' + err.message, 'error');
-    setSyncStatus('error', 'Failed');
-  }
-}
-
-function changeApiUrl() {
-  const newUrl = prompt('Enter new Google Apps Script Web App URL:', API_URL);
-  if (newUrl && newUrl.trim()) {
-    API_URL = newUrl.trim();
-    localStorage.setItem('inventrackApiUrl', API_URL);
-    updateSettingsDisplay();
-    testCurrentConnection();
-  }
+function showSetup() {
+  document.getElementById('setupScreen').classList.remove('hidden');
+  document.getElementById('loginScreen').classList.add('hidden');
 }
 
 // ============================================================
-//  INITIALIZATION
+//  LOGIN SCREEN
+// ============================================================
+function showLogin() {
+  document.getElementById('setupScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  err.style.display='none';
+  btn.classList.add('btn-loading'); btn.disabled=true;
+
+  try {
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const r = await apiPostNoAuth('login', { username, password });
+    if (r.success) {
+      SESSION = { token: r.token, user: r.user };
+      localStorage.setItem('invSession', JSON.stringify(SESSION));
+      document.getElementById('loginScreen').classList.add('hidden');
+      initApp();
+    } else {
+      err.textContent = '❌ ' + (r.error || 'Login failed');
+      err.style.display = 'block';
+    }
+  } catch(ex) {
+    err.textContent = '❌ ' + ex.message;
+    err.style.display = 'block';
+  } finally {
+    btn.classList.remove('btn-loading'); btn.disabled=false;
+  }
+}
+
+// Post without session token (for login)
+async function apiPostNoAuth(action, data) {
+  const r = await fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action, data, token:'' }),
+    redirect:'follow'
+  });
+  return await r.json();
+}
+
+async function doLogout() {
+  toggleUserMenu(false);
+  try { await apiPost('logout'); } catch(e) {}
+  SESSION = null;
+  localStorage.removeItem('invSession');
+  showLogin();
+  showToast('Signed out');
+}
+
+// ============================================================
+//  INIT APP
 // ============================================================
 async function initApp() {
-  initRole();
-  showLoadingOverlay(true, 'Loading inventory data...');
+  const role = SESSION.user.role;
+  const name = SESSION.user.displayName || SESSION.user.username;
 
+  // Set UI
+  document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('userAvatar').style.background = role === 'admin' ? 'var(--primary)' : '#7b1fa2';
+  document.getElementById('menuName').textContent = name;
+  document.getElementById('menuRole').textContent = role === 'admin' ? 'Administrator' : 'Staff';
+
+  // Hide admin elements for staff
+  if (role !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display='none');
+  } else {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display='');
+  }
+
+  showLoading(true, 'Loading data...');
   try {
     await loadAllData();
     refreshAllViews();
-    updateSettingsDisplay();
-    showLoadingOverlay(false);
-    startAutoRefresh();
-
-    if (USER_ROLE === 'staff') showPage('stockin');
-    else showPage('dashboard');
-  } catch(err) {
-    showLoadingOverlay(false);
-    showToast('Failed to load data: ' + err.message, 'error');
+    updateSettings();
+    showLoading(false);
+    startRefresh();
+    showPage(role === 'admin' ? 'dashboard' : 'stockin');
+  } catch(ex) {
+    showLoading(false);
+    if (ex.message !== 'Session expired') showToast('Load error: '+ex.message, 'error');
   }
 }
 
-function initRole() {
-  const badge = document.getElementById('roleBadge');
-  if (USER_ROLE === 'staff') {
-    badge.className = 'role-badge staff';
-    badge.innerHTML = '<i class="bi bi-person-fill"></i> Staff';
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-    const addBtn = document.getElementById('addProductBtn');
-    if (addBtn) addBtn.style.display = 'none';
-  }
-}
-
-function showLoadingOverlay(show, text) {
+function showLoading(show, text) {
   const ol = document.getElementById('loadingOverlay');
   if (text) document.getElementById('loadingText').textContent = text;
-  if (show) ol.classList.remove('hidden');
-  else ol.classList.add('hidden');
+  ol.classList.toggle('hidden', !show);
 }
 
-function updateSettingsDisplay() {
-  document.getElementById('currentApiUrl').textContent = API_URL || 'Not configured';
-  // Staff link
-  const base = window.location.origin + window.location.pathname;
-  const encodedApi = btoa(API_URL);
-  const staffUrl = base + '?role=staff&api=' + encodedApi;
-  document.getElementById('staffLink').textContent = staffUrl;
-  // Sheet link (extract spreadsheet URL from script URL)
-  const sheetLink = document.getElementById('sheetLink');
-  sheetLink.href = API_URL.replace('/exec', '').replace('macros/s/', 'a/') || '#';
+// ============================================================
+//  DATA
+// ============================================================
+async function loadAllData() {
+  setSync('loading','Syncing...');
+  try {
+    const r = await apiGet('getAll');
+    if (r.success) {
+      appData = { products: r.products||[], transactions: r.transactions||[] };
+      setSync('online','Synced');
+      document.getElementById('lastRefresh').textContent = 'Last: '+new Date().toLocaleTimeString();
+    } else throw new Error(r.error);
+  } catch(e) { setSync('error','Failed'); throw e; }
 }
 
-function startAutoRefresh() {
-  const saved = localStorage.getItem('inventrackRefreshInterval');
-  if (saved !== null) document.getElementById('refreshInterval').value = saved;
-  setRefreshInterval();
+async function refreshData() {
+  try { await loadAllData(); refreshAllViews(); showToast('Refreshed'); }
+  catch(e) { if (e.message!=='Session expired') showToast('Refresh failed','error'); }
 }
 
-function setRefreshInterval() {
+function setSync(s,t) {
+  document.getElementById('syncDot').className='sync-dot '+s;
+  document.getElementById('syncText').textContent=t;
+}
+
+function startRefresh() {
+  const saved = localStorage.getItem('invRefresh');
+  if (saved) document.getElementById('refreshInterval').value = saved;
+  setRefresh();
+}
+
+function setRefresh() {
   if (refreshTimer) clearInterval(refreshTimer);
-  const seconds = parseInt(document.getElementById('refreshInterval').value) || 0;
-  localStorage.setItem('inventrackRefreshInterval', seconds);
-  if (seconds > 0) {
-    refreshTimer = setInterval(async () => {
-      try {
-        await loadAllData();
-        refreshAllViews();
-      } catch(e) { console.error('Auto-refresh failed:', e); }
-    }, seconds * 1000);
-  }
+  const sec = parseInt(document.getElementById('refreshInterval').value)||0;
+  localStorage.setItem('invRefresh', sec);
+  if (sec > 0) refreshTimer = setInterval(async ()=>{
+    try { await loadAllData(); refreshAllViews(); } catch(e){}
+  }, sec*1000);
 }
 
 // ============================================================
 //  NAVIGATION
 // ============================================================
-function showPage(pageId) {
-  const adminPages = ['dashboard','transactions','export','settings'];
-  if (USER_ROLE === 'staff' && adminPages.includes(pageId)) pageId = 'stockin';
+function showPage(p) {
+  const role = SESSION ? SESSION.user.role : 'staff';
+  const adminPages = ['dashboard','transactions','export','users','settings'];
+  if (role !== 'admin' && adminPages.includes(p)) p = 'stockin';
 
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  const pg = document.getElementById('page-'+p);
+  const nv = document.querySelector('.nav-item[data-page="'+p+'"]');
+  if (pg) pg.classList.add('active');
+  if (nv) nv.classList.add('active');
 
-  const page = document.getElementById('page-' + pageId);
-  const nav = document.querySelector('.nav-item[data-page="'+pageId+'"]');
-  if (page) page.classList.add('active');
-  if (nav) nav.classList.add('active');
+  const titles = {dashboard:'Dashboard',products:'Products',stockin:'Stock In',stockout:'Stock Out',transactions:'Transactions',export:'Export',users:'User Management',settings:'Settings'};
+  document.getElementById('pageTitle').textContent = titles[p]||p;
 
-  const titles = { dashboard:'Dashboard', products:'Products', stockin:'Stock In',
-    stockout:'Stock Out', transactions:'Transaction History', export:'Export to Excel', settings:'Settings' };
-  document.getElementById('pageTitle').textContent = titles[pageId] || pageId;
+  if (p==='dashboard') refreshDash();
+  if (p==='products') renderProducts();
+  if (p==='stockin'||p==='stockout') populateSelects();
+  if (p==='transactions') { populateTxF(); renderTx(); }
+  if (p==='users') loadUsers();
 
-  if (pageId === 'dashboard') refreshDashboard();
-  if (pageId === 'products') renderProducts();
-  if (pageId === 'stockin' || pageId === 'stockout') populateProductSelects();
-  if (pageId === 'transactions') { populateTxFilterProducts(); renderTransactions(); }
-
-  if (window.innerWidth <= 768) toggleSidebar(false);
+  if (window.innerWidth<=768) toggleSidebar(false);
 }
 
-function toggleSidebar(forceShow) {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  const show = forceShow !== undefined ? forceShow : !sb.classList.contains('show');
-  sb.classList.toggle('show', show);
-  ov.classList.toggle('show', show);
+function toggleSidebar(force) {
+  const sb=document.getElementById('sidebar'), ov=document.getElementById('sidebarOverlay');
+  const show = force!==undefined ? force : !sb.classList.contains('show');
+  sb.classList.toggle('show',show); ov.classList.toggle('show',show);
 }
+
+// User menu
+function toggleUserMenu(force) {
+  const m = document.getElementById('userMenu');
+  const show = force!==undefined ? force : !m.classList.contains('show');
+  m.classList.toggle('show', show);
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('userDropdown').contains(e.target)) toggleUserMenu(false);
+});
 
 // ============================================================
 //  TOAST
 // ============================================================
-function showToast(message, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  const icons = { success:'check-circle-fill', error:'x-circle-fill', warning:'exclamation-triangle-fill' };
-  const colors = { success:'#2ec4b6', error:'#e63946', warning:'#f77f00' };
-  const t = document.createElement('div');
-  t.className = 'custom-toast ' + type;
-  t.innerHTML = `<i class="bi bi-${icons[type]||icons.success}" style="color:${colors[type]};font-size:20px;"></i><span style="font-size:14px;">${escHtml(message)}</span>`;
-  container.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3500);
+function showToast(msg,type='success') {
+  const c=document.getElementById('toastContainer');
+  const icons={success:'check-circle-fill',error:'x-circle-fill',warning:'exclamation-triangle-fill'};
+  const cols={success:'#2ec4b6',error:'#e63946',warning:'#f77f00'};
+  const t=document.createElement('div');
+  t.className='custom-toast '+type;
+  t.innerHTML=`<i class="bi bi-${icons[type]||icons.success}" style="color:${cols[type]};font-size:18px;"></i><span style="font-size:13px;">${esc(msg)}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3500);
 }
 
 // ============================================================
-//  REFRESH ALL VIEWS
+//  REFRESH ALL
 // ============================================================
 function refreshAllViews() {
-  refreshDashboard();
+  refreshDash();
   renderProducts();
-  populateProductSelects();
   document.getElementById('productCount').textContent = appData.products.length;
 }
 
 // ============================================================
 //  DASHBOARD
 // ============================================================
-function refreshDashboard() {
-  const prods = appData.products;
-  const totalQty = prods.reduce((s,p) => s + p.quantity, 0);
-  const totalVal = prods.reduce((s,p) => s + p.quantity * p.averageCost, 0);
-  const lowStock = prods.filter(p => p.quantity <= p.minStock).length;
+function refreshDash() {
+  const P=appData.products;
+  document.getElementById('statProducts').textContent=P.length;
+  document.getElementById('statTotalQty').textContent=P.reduce((s,p)=>s+p.quantity,0).toLocaleString();
+  document.getElementById('statTotalValue').textContent='$'+P.reduce((s,p)=>s+p.quantity*p.averageCost,0).toFixed(2);
+  const ls=P.filter(p=>p.quantity<=p.minStock);
+  document.getElementById('statLowStock').textContent=ls.length;
+  document.getElementById('lowStockList').innerHTML = ls.length===0
+    ? '<div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All healthy</p></div>'
+    : ls.map(p=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;"><div><strong>${esc(p.name)}</strong><br><small class="text-muted">${esc(p.sku)}</small></div><div class="text-end"><span class="badge-low">${p.quantity} ${esc(p.unit)}</span><br><small class="text-muted">Min: ${p.minStock}</small></div></div>`).join('');
 
-  document.getElementById('statProducts').textContent = prods.length;
-  document.getElementById('statTotalQty').textContent = totalQty.toLocaleString();
-  document.getElementById('statTotalValue').textContent = '$' + totalVal.toFixed(2);
-  document.getElementById('statLowStock').textContent = lowStock;
-
-  // Low stock
-  const lowItems = prods.filter(p => p.quantity <= p.minStock);
-  const lowEl = document.getElementById('lowStockList');
-  if (lowItems.length === 0) {
-    lowEl.innerHTML = '<div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All stock levels are healthy</p></div>';
-  } else {
-    lowEl.innerHTML = lowItems.map(p => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0;">
-        <div><strong style="font-size:14px;">${escHtml(p.name)}</strong><div class="text-muted" style="font-size:12px;">${escHtml(p.sku)}</div></div>
-        <div style="text-align:right;"><span class="badge-low">${p.quantity} ${escHtml(p.unit)}</span><div class="text-muted" style="font-size:11px;">Min: ${p.minStock}</div></div>
-      </div>`).join('');
-  }
-
-  // Recent transactions
-  const recent = [...appData.transactions].reverse().slice(0, 8);
-  const tbody = document.getElementById('recentTransBody');
-  if (recent.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No transactions yet</td></tr>';
-  } else {
-    tbody.innerHTML = recent.map(tx => {
-      const prod = appData.products.find(p => p.id === tx.productId);
-      return `<tr><td>${tx.date}</td><td>${prod ? escHtml(prod.name) : 'Deleted'}</td>
-        <td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td>
-        <td>${tx.quantity}</td><td>$${tx.totalCost.toFixed(2)}</td></tr>`;
-    }).join('');
-  }
+  const rec=[...appData.transactions].reverse().slice(0,8);
+  document.getElementById('recentTransBody').innerHTML = rec.length===0
+    ? '<tr><td colspan="5" class="text-center text-muted py-4">No transactions</td></tr>'
+    : rec.map(tx=>{const p=appData.products.find(x=>x.id===tx.productId);return`<tr><td>${tx.date}</td><td>${p?esc(p.name):'?'}</td><td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td><td>${tx.quantity}</td><td>${esc(tx.by||'-')}</td></tr>`;}).join('');
 }
 
 // ============================================================
 //  PRODUCTS
 // ============================================================
 function renderProducts() {
-  const search = (document.getElementById('productSearch').value || '').toLowerCase();
-  let prods = appData.products;
-  if (search) prods = prods.filter(p => p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search) || (p.category||'').toLowerCase().includes(search));
-
-  const tbody = document.getElementById('productsTableBody');
-  if (prods.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="bi bi-box-seam"></i><h5>No Products Found</h5><p>Add your first product to get started</p></div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = prods.map(p => {
-    const tv = p.quantity * p.averageCost;
-    const low = p.quantity <= p.minStock;
-    return `<tr>
-      <td><code>${escHtml(p.sku)}</code></td>
-      <td><strong>${escHtml(p.name)}</strong></td>
-      <td>${escHtml(p.category||'-')}</td>
-      <td><strong>${p.quantity}</strong> <small class="text-muted">${escHtml(p.unit)}</small></td>
-      <td>$${p.averageCost.toFixed(4)}</td>
-      <td><strong>$${tv.toFixed(2)}</strong></td>
-      <td>${low ? '<span class="badge-low">Low Stock</span>' : '<span class="badge-ok">OK</span>'}</td>
-      <td><div style="display:flex;gap:4px;">${USER_ROLE==='admin' ?
-        `<button class="btn-icon success" onclick="openProductModal(${p.id})" title="Edit"><i class="bi bi-pencil-fill" style="font-size:13px;"></i></button>
-         <button class="btn-icon danger" onclick="deleteProduct(${p.id})" title="Delete"><i class="bi bi-trash-fill" style="font-size:13px;"></i></button>` : '-'
-      }</div></td></tr>`;
-  }).join('');
+  const q=(document.getElementById('productSearch').value||'').toLowerCase();
+  let P=appData.products;
+  if(q) P=P.filter(p=>p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q));
+  const isAdmin = SESSION && SESSION.user.role==='admin';
+  const tb=document.getElementById('productsTableBody');
+  if(!P.length){tb.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="bi bi-box-seam"></i><h5>No Products</h5></div></td></tr>';return;}
+  tb.innerHTML=P.map(p=>{const v=p.quantity*p.averageCost;const low=p.quantity<=p.minStock;return`<tr>
+    <td><code>${esc(p.sku)}</code></td><td><strong>${esc(p.name)}</strong></td><td>${esc(p.category||'-')}</td>
+    <td><strong>${p.quantity}</strong> <small class="text-muted">${esc(p.unit)}</small></td>
+    <td>$${p.averageCost.toFixed(4)}</td><td><strong>$${v.toFixed(2)}</strong></td>
+    <td>${low?'<span class="badge-low">Low</span>':'<span class="badge-ok">OK</span>'}</td>
+    <td class="admin-only">${isAdmin?`<div style="display:flex;gap:4px;">
+      <button class="btn-icon success" onclick="openProductModal(${p.id})"><i class="bi bi-pencil-fill" style="font-size:13px;"></i></button>
+      <button class="btn-icon danger" onclick="deleteProduct(${p.id})"><i class="bi bi-trash-fill" style="font-size:13px;"></i></button></div>`:''}</td></tr>`;}).join('');
 }
 
 function openProductModal(editId) {
-  const form = document.getElementById('productForm');
-  form.reset();
-  document.getElementById('pEditId').value = '';
-  document.getElementById('pUnit').value = 'pcs';
-  document.getElementById('pMinStock').value = '10';
-
-  if (editId) {
-    const p = appData.products.find(x => x.id === editId);
-    if (!p) return;
-    document.getElementById('productModalTitle').textContent = 'Edit Product';
-    document.getElementById('pEditId').value = p.id;
-    document.getElementById('pSku').value = p.sku;
-    document.getElementById('pName').value = p.name;
-    document.getElementById('pCategory').value = p.category || '';
-    document.getElementById('pUnit').value = p.unit || 'pcs';
-    document.getElementById('pMinStock').value = p.minStock || 10;
-  } else {
-    document.getElementById('productModalTitle').textContent = 'Add New Product';
-  }
+  document.getElementById('productForm').reset();
+  document.getElementById('pEditId').value='';
+  document.getElementById('pUnit').value='pcs';document.getElementById('pMin').value='10';
+  if(editId){const p=appData.products.find(x=>x.id===editId);if(!p)return;
+    document.getElementById('pmTitle').textContent='Edit Product';
+    document.getElementById('pEditId').value=p.id;document.getElementById('pSku').value=p.sku;
+    document.getElementById('pName').value=p.name;document.getElementById('pCat').value=p.category||'';
+    document.getElementById('pUnit').value=p.unit||'pcs';document.getElementById('pMin').value=p.minStock||10;
+  } else document.getElementById('pmTitle').textContent='Add Product';
   new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
 async function saveProduct(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btnSaveProduct');
-  btn.classList.add('btn-loading'); btn.disabled = true;
-
-  const editId = document.getElementById('pEditId').value;
-  const data = {
-    sku: document.getElementById('pSku').value.trim(),
-    name: document.getElementById('pName').value.trim(),
-    category: document.getElementById('pCategory').value.trim(),
-    unit: document.getElementById('pUnit').value.trim() || 'pcs',
-    minStock: parseInt(document.getElementById('pMinStock').value) || 10
-  };
-
-  try {
-    let result;
-    if (editId) {
-      data.id = parseInt(editId);
-      result = await apiPost('updateProduct', data);
-    } else {
-      result = await apiPost('addProduct', data);
-    }
-
-    if (result.success) {
-      showToast(result.message);
-      bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
-      await loadAllData();
-      refreshAllViews();
-    } else {
-      showToast(result.error || 'Failed', 'error');
-    }
-  } catch(err) {
-    showToast('Error: ' + err.message, 'error');
-  } finally {
-    btn.classList.remove('btn-loading'); btn.disabled = false;
-  }
+  e.preventDefault();const btn=document.getElementById('btnSaveP');btn.classList.add('btn-loading');btn.disabled=true;
+  try{const editId=document.getElementById('pEditId').value;
+    const d={sku:document.getElementById('pSku').value.trim(),name:document.getElementById('pName').value.trim(),category:document.getElementById('pCat').value.trim(),unit:document.getElementById('pUnit').value.trim()||'pcs',minStock:parseInt(document.getElementById('pMin').value)||10};
+    let r;if(editId){d.id=parseInt(editId);r=await apiPost('updateProduct',d);}else{r=await apiPost('addProduct',d);}
+    if(r.success){showToast(r.message);bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();await loadAllData();refreshAllViews();}
+    else showToast(r.error,'error');
+  }catch(ex){showToast(ex.message,'error');}finally{btn.classList.remove('btn-loading');btn.disabled=false;}
 }
 
 async function deleteProduct(id) {
-  const p = appData.products.find(x => x.id === id);
-  if (!p) return;
-  if (!confirm('Delete "' + p.name + '"? This cannot be undone.')) return;
-
-  try {
-    const result = await apiPost('deleteProduct', { id });
-    if (result.success) {
-      showToast(result.message, 'warning');
-      await loadAllData();
-      refreshAllViews();
-    } else {
-      showToast(result.error || 'Failed', 'error');
-    }
-  } catch(err) {
-    showToast('Error: ' + err.message, 'error');
-  }
+  const p=appData.products.find(x=>x.id===id);if(!p||!confirm('Delete "'+p.name+'"?'))return;
+  try{const r=await apiPost('deleteProduct',{id});if(r.success){showToast(r.message,'warning');await loadAllData();refreshAllViews();}else showToast(r.error,'error');}
+  catch(ex){showToast(ex.message,'error');}
 }
 
 // ============================================================
-//  PRODUCT SELECTS
+//  SELECTS
 // ============================================================
-function populateProductSelects() {
-  const opts = '<option value="">-- Select Product --</option>' +
-    appData.products.map(p =>
-      `<option value="${p.id}">${escHtml(p.sku)} - ${escHtml(p.name)} (Stock: ${p.quantity})</option>`
-    ).join('');
-
-  const si = document.getElementById('siProduct');
-  const so = document.getElementById('soProduct');
-  if (si) si.innerHTML = opts;
-  if (so) so.innerHTML = opts;
-
-  document.getElementById('stockInForm').reset();
-  document.getElementById('stockOutForm').reset();
-  document.getElementById('siTotalCost').value = '';
-  document.getElementById('soTotalCost').value = '';
-
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('siDate').value = today;
-  document.getElementById('soDate').value = today;
-
-  resetInfoPanel('siInfoPanel');
-  resetInfoPanel('soInfoPanel');
+function populateSelects() {
+  const o='<option value="">-- Select --</option>'+appData.products.map(p=>`<option value="${p.id}">${esc(p.sku)} - ${esc(p.name)} (${p.quantity})</option>`).join('');
+  ['siProduct','soProduct'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=o;});
+  ['stockInForm','stockOutForm'].forEach(id=>document.getElementById(id).reset());
+  document.getElementById('siTotal').value='';document.getElementById('soTotal').value='';
+  const td=new Date().toISOString().split('T')[0];
+  document.getElementById('siDate').value=td;document.getElementById('soDate').value=td;
+  resetPanel('siInfo');resetPanel('soInfo');
 }
-
-function resetInfoPanel(id) {
-  document.getElementById(id).innerHTML =
-    '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product to see current info</p></div>';
-}
+function resetPanel(id){document.getElementById(id).innerHTML='<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product</p></div>';}
 
 // ============================================================
 //  STOCK IN
 // ============================================================
-function updateStockInInfo() {
-  const id = parseInt(document.getElementById('siProduct').value);
-  const panel = document.getElementById('siInfoPanel');
-  const prod = appData.products.find(p => p.id === id);
-  if (!prod) { resetInfoPanel('siInfoPanel'); return; }
-  const tv = prod.quantity * prod.averageCost;
-  panel.innerHTML = `
-    <div class="mb-3 p-3 rounded" style="background:#f8f9fa;">
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Product</span><strong>${escHtml(prod.name)}</strong></div>
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">SKU</span><code>${escHtml(prod.sku)}</code></div>
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Current Stock</span><strong>${prod.quantity} ${escHtml(prod.unit)}</strong></div>
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Average Cost</span><strong>$${prod.averageCost.toFixed(4)}</strong></div>
-      <div class="d-flex justify-content-between"><span class="text-muted small">Total Value</span><strong>$${tv.toFixed(2)}</strong></div>
-    </div>
+function updateSIInfo(){
+  const id=parseInt(document.getElementById('siProduct').value);const el=document.getElementById('siInfo');
+  const p=appData.products.find(x=>x.id===id);if(!p){resetPanel('siInfo');return;}
+  el.innerHTML=`<div class="p-3 rounded mb-3" style="background:#f8f9fa;">
+    <div class="d-flex justify-content-between mb-1"><small class="text-muted">Product</small><strong>${esc(p.name)}</strong></div>
+    <div class="d-flex justify-content-between mb-1"><small class="text-muted">Stock</small><strong>${p.quantity} ${esc(p.unit)}</strong></div>
+    <div class="d-flex justify-content-between mb-1"><small class="text-muted">Avg Cost</small><strong>$${p.averageCost.toFixed(4)}</strong></div>
+    <div class="d-flex justify-content-between"><small class="text-muted">Value</small><strong>$${(p.quantity*p.averageCost).toFixed(2)}</strong></div></div>
     <div class="p-3 rounded" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">
-      <div class="small" style="opacity:.8;">New Average Cost (Preview)</div>
-      <div style="font-size:24px;font-weight:700;" id="siNewAvgCost">$${prod.averageCost.toFixed(4)}</div>
-    </div>`;
-  calcStockInTotal();
+    <div class="small" style="opacity:.8;">New Avg Cost Preview</div><div style="font-size:24px;font-weight:700;" id="siNewAvg">$${p.averageCost.toFixed(4)}</div></div>`;
+  calcSI();
 }
-
-function calcStockInTotal() {
-  const qty = parseFloat(document.getElementById('siQuantity').value) || 0;
-  const cost = parseFloat(document.getElementById('siUnitCost').value) || 0;
-  const total = qty * cost;
-  document.getElementById('siTotalCost').value = total > 0 ? '$' + total.toFixed(2) : '';
-
-  const id = parseInt(document.getElementById('siProduct').value);
-  const prod = appData.products.find(p => p.id === id);
-  const el = document.getElementById('siNewAvgCost');
-  if (prod && el && qty > 0 && cost > 0) {
-    const newAvg = ((prod.quantity * prod.averageCost) + (qty * cost)) / (prod.quantity + qty);
-    el.textContent = '$' + newAvg.toFixed(4);
-  }
+function calcSI(){
+  const q=parseFloat(document.getElementById('siQty').value)||0;const c=parseFloat(document.getElementById('siCost').value)||0;
+  document.getElementById('siTotal').value=q*c>0?'$'+(q*c).toFixed(2):'';
+  const id=parseInt(document.getElementById('siProduct').value);const p=appData.products.find(x=>x.id===id);const el=document.getElementById('siNewAvg');
+  if(p&&el&&q>0&&c>0)el.textContent='$'+(((p.quantity*p.averageCost)+(q*c))/(p.quantity+q)).toFixed(4);
 }
-
-async function processStockIn(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btnStockIn');
-  btn.classList.add('btn-loading'); btn.disabled = true;
-
-  try {
-    const data = {
-      productId: parseInt(document.getElementById('siProduct').value),
-      quantity: parseFloat(document.getElementById('siQuantity').value),
-      unitCost: parseFloat(document.getElementById('siUnitCost').value),
-      date: document.getElementById('siDate').value || new Date().toISOString().split('T')[0],
-      notes: document.getElementById('siNotes').value.trim(),
-      by: USER_ROLE
-    };
-
-    const result = await apiPost('stockIn', data);
-    if (result.success) {
-      showToast(result.message);
-      await loadAllData();
-      refreshAllViews();
-      populateProductSelects();
-    } else {
-      showToast(result.error || 'Failed', 'error');
-    }
-  } catch(err) {
-    showToast('Error: ' + err.message, 'error');
-  } finally {
-    btn.classList.remove('btn-loading'); btn.disabled = false;
-  }
+async function processStockIn(e){
+  e.preventDefault();const btn=document.getElementById('btnSI');btn.classList.add('btn-loading');btn.disabled=true;
+  try{const d={productId:parseInt(document.getElementById('siProduct').value),quantity:parseFloat(document.getElementById('siQty').value),unitCost:parseFloat(document.getElementById('siCost').value),date:document.getElementById('siDate').value||new Date().toISOString().split('T')[0],notes:document.getElementById('siNotes').value.trim()};
+    const r=await apiPost('stockIn',d);if(r.success){showToast(r.message);await loadAllData();refreshAllViews();populateSelects();}else showToast(r.error,'error');
+  }catch(ex){showToast(ex.message,'error');}finally{btn.classList.remove('btn-loading');btn.disabled=false;}
 }
 
 // ============================================================
 //  STOCK OUT
 // ============================================================
-function updateStockOutInfo() {
-  const id = parseInt(document.getElementById('soProduct').value);
-  const panel = document.getElementById('soInfoPanel');
-  const prod = appData.products.find(p => p.id === id);
-  if (!prod) { resetInfoPanel('soInfoPanel'); return; }
-  const tv = prod.quantity * prod.averageCost;
-  panel.innerHTML = `
-    <div class="mb-3 p-3 rounded" style="background:#f8f9fa;">
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Product</span><strong>${escHtml(prod.name)}</strong></div>
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Current Stock</span>
-        <strong style="color:${prod.quantity <= prod.minStock ? 'var(--danger)' : 'inherit'};">${prod.quantity} ${escHtml(prod.unit)}</strong></div>
-      <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Average Cost</span><strong>$${prod.averageCost.toFixed(4)}</strong></div>
-      <div class="d-flex justify-content-between"><span class="text-muted small">Total Value</span><strong>$${tv.toFixed(2)}</strong></div>
-    </div>
-    <div class="alert alert-warning small mb-0">
-      <i class="bi bi-info-circle me-1"></i>
-      Stock out uses average cost of <strong>$${prod.averageCost.toFixed(4)}</strong>/unit.
-      <br>Maximum quantity: <strong>${prod.quantity}</strong>
-    </div>`;
-  document.getElementById('soQuantity').max = prod.quantity;
-  calcStockOutTotal();
+function updateSOInfo(){
+  const id=parseInt(document.getElementById('soProduct').value);const el=document.getElementById('soInfo');
+  const p=appData.products.find(x=>x.id===id);if(!p){resetPanel('soInfo');return;}
+  el.innerHTML=`<div class="p-3 rounded mb-3" style="background:#f8f9fa;">
+    <div class="d-flex justify-content-between mb-1"><small class="text-muted">Product</small><strong>${esc(p.name)}</strong></div>
+    <div class="d-flex justify-content-between mb-1"><small class="text-muted">Stock</small><strong style="color:${p.quantity<=p.minStock?'var(--danger)':'inherit'}">${p.quantity} ${esc(p.unit)}</strong></div>
+    <div class="d-flex justify-content-between"><small class="text-muted">Avg Cost</small><strong>$${p.averageCost.toFixed(4)}</strong></div></div>
+    <div class="alert alert-warning small mb-0"><i class="bi bi-info-circle me-1"></i>Uses avg cost $${p.averageCost.toFixed(4)}/unit. Max: ${p.quantity}</div>`;
+  document.getElementById('soQty').max=p.quantity;calcSO();
 }
-
-function calcStockOutTotal() {
-  const id = parseInt(document.getElementById('soProduct').value);
-  const qty = parseFloat(document.getElementById('soQuantity').value) || 0;
-  const prod = appData.products.find(p => p.id === id);
-  document.getElementById('soTotalCost').value = (prod && qty > 0) ? '$' + (qty * prod.averageCost).toFixed(2) : '';
+function calcSO(){
+  const id=parseInt(document.getElementById('soProduct').value);const q=parseFloat(document.getElementById('soQty').value)||0;
+  const p=appData.products.find(x=>x.id===id);document.getElementById('soTotal').value=(p&&q>0)?'$'+(q*p.averageCost).toFixed(2):'';
 }
-
-async function processStockOut(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btnStockOut');
-  btn.classList.add('btn-loading'); btn.disabled = true;
-
-  try {
-    const data = {
-      productId: parseInt(document.getElementById('soProduct').value),
-      quantity: parseFloat(document.getElementById('soQuantity').value),
-      date: document.getElementById('soDate').value || new Date().toISOString().split('T')[0],
-      notes: document.getElementById('soNotes').value.trim(),
-      by: USER_ROLE
-    };
-
-    const result = await apiPost('stockOut', data);
-    if (result.success) {
-      showToast(result.message);
-      await loadAllData();
-      refreshAllViews();
-      populateProductSelects();
-    } else {
-      showToast(result.error || 'Failed', 'error');
-    }
-  } catch(err) {
-    showToast('Error: ' + err.message, 'error');
-  } finally {
-    btn.classList.remove('btn-loading'); btn.disabled = false;
-  }
+async function processStockOut(e){
+  e.preventDefault();const btn=document.getElementById('btnSO');btn.classList.add('btn-loading');btn.disabled=true;
+  try{const d={productId:parseInt(document.getElementById('soProduct').value),quantity:parseFloat(document.getElementById('soQty').value),date:document.getElementById('soDate').value||new Date().toISOString().split('T')[0],notes:document.getElementById('soNotes').value.trim()};
+    const r=await apiPost('stockOut',d);if(r.success){showToast(r.message);await loadAllData();refreshAllViews();populateSelects();}else showToast(r.error,'error');
+  }catch(ex){showToast(ex.message,'error');}finally{btn.classList.remove('btn-loading');btn.disabled=false;}
 }
 
 // ============================================================
 //  TRANSACTIONS
 // ============================================================
-function populateTxFilterProducts() {
-  document.getElementById('txFilterProduct').innerHTML = '<option value="">All Products</option>' +
-    appData.products.map(p => `<option value="${p.id}">${escHtml(p.sku)} - ${escHtml(p.name)}</option>`).join('');
+function populateTxF(){document.getElementById('txFProd').innerHTML='<option value="">All Products</option>'+appData.products.map(p=>`<option value="${p.id}">${esc(p.sku)} - ${esc(p.name)}</option>`).join('');}
+function renderTx(){
+  const tf=document.getElementById('txFType').value,pf=document.getElementById('txFProd').value,ff=document.getElementById('txFFrom').value,ft=document.getElementById('txFTo').value;
+  let txs=[...appData.transactions].reverse();
+  if(tf)txs=txs.filter(t=>t.type===tf);if(pf)txs=txs.filter(t=>t.productId===parseInt(pf));
+  if(ff)txs=txs.filter(t=>t.date>=ff);if(ft)txs=txs.filter(t=>t.date<=ft);
+  const tb=document.getElementById('txBody');
+  if(!txs.length){tb.innerHTML='<tr><td colspan="10" class="text-center text-muted py-4">No transactions</td></tr>';return;}
+  tb.innerHTML=txs.map(tx=>{const p=appData.products.find(x=>x.id===tx.productId);return`<tr><td>${tx.id}</td><td>${tx.date}</td><td>${p?esc(p.name):'?'}</td><td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td><td>${tx.type==='IN'?'+':'-'}${tx.quantity}</td><td>$${tx.unitCost.toFixed(4)}</td><td><strong>$${tx.totalCost.toFixed(2)}</strong></td><td>$${(tx.avgCostAfter||0).toFixed(4)}</td><td class="text-muted small">${esc(tx.notes||'-')}</td><td><span class="badge bg-secondary" style="font-size:10px;">${esc(tx.by||'-')}</span></td></tr>`;}).join('');
+}
+function clearTxF(){['txFType','txFProd','txFFrom','txFTo'].forEach(id=>document.getElementById(id).value='');renderTx();}
+
+// ============================================================
+//  USER MANAGEMENT
+// ============================================================
+async function loadUsers() {
+  try {
+    const r = await apiGet('listUsers');
+    if (r.success) { usersData = r.users; renderUsers(); }
+    else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
 }
 
-function renderTransactions() {
-  const typeF = document.getElementById('txFilterType').value;
-  const prodF = document.getElementById('txFilterProduct').value;
-  const fromF = document.getElementById('txFilterFrom').value;
-  const toF   = document.getElementById('txFilterTo').value;
-
-  let txs = [...appData.transactions].reverse();
-  if (typeF) txs = txs.filter(t => t.type === typeF);
-  if (prodF) txs = txs.filter(t => t.productId === parseInt(prodF));
-  if (fromF) txs = txs.filter(t => t.date >= fromF);
-  if (toF)   txs = txs.filter(t => t.date <= toF);
-
-  const tbody = document.getElementById('transactionsTableBody');
-  if (txs.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">No transactions found</td></tr>';
-    return;
-  }
-  tbody.innerHTML = txs.map(tx => {
-    const prod = appData.products.find(p => p.id === tx.productId);
+function renderUsers() {
+  const tb = document.getElementById('usersTableBody');
+  if (!usersData.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No users</td></tr>'; return; }
+  const myId = SESSION.user.id;
+  tb.innerHTML = usersData.map(u => {
+    const isMe = u.id === myId;
+    const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleString() : 'Never';
     return `<tr>
-      <td>${tx.id}</td><td>${tx.date}</td>
-      <td>${prod ? escHtml(prod.name) : '<em class="text-muted">Deleted</em>'}</td>
-      <td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td>
-      <td>${tx.type==='IN'?'+':'-'}${tx.quantity}</td>
-      <td>$${tx.unitCost.toFixed(4)}</td>
-      <td><strong>$${tx.totalCost.toFixed(2)}</strong></td>
-      <td>$${(tx.avgCostAfter||0).toFixed(4)}</td>
-      <td class="text-muted small">${escHtml(tx.notes||'-')}</td>
-      <td><span class="badge ${tx.by==='admin'?'bg-success':'bg-warning text-dark'}" style="font-size:10px;">${tx.by||'-'}</span></td>
-    </tr>`;
+      <td><strong>${esc(u.username)}</strong>${isMe?' <small class="text-muted">(you)</small>':''}</td>
+      <td>${esc(u.displayName)}</td>
+      <td><span class="badge-role-${u.role}">${u.role}</span></td>
+      <td><span class="badge-${u.status}">${u.status}</span></td>
+      <td class="small text-muted">${lastLogin}</td>
+      <td>${isMe?'<span class="text-muted small">-</span>':`<div style="display:flex;gap:4px;">
+        <button class="btn-icon warning" onclick="openResetPw(${u.id},'${esc(u.username)}')" title="Reset Password"><i class="bi bi-key-fill" style="font-size:13px;"></i></button>
+        <button class="btn-icon ${u.status==='active'?'warning':'success'}" onclick="toggleUser(${u.id})" title="${u.status==='active'?'Disable':'Enable'}"><i class="bi bi-${u.status==='active'?'pause-circle-fill':'play-circle-fill'}" style="font-size:13px;"></i></button>
+        <button class="btn-icon danger" onclick="deleteUser(${u.id},'${esc(u.username)}')" title="Delete"><i class="bi bi-trash-fill" style="font-size:13px;"></i></button>
+      </div>`}</td></tr>`;
   }).join('');
 }
 
-function clearTxFilters() {
-  document.getElementById('txFilterType').value = '';
-  document.getElementById('txFilterProduct').value = '';
-  document.getElementById('txFilterFrom').value = '';
-  document.getElementById('txFilterTo').value = '';
-  renderTransactions();
+function openUserModal() {
+  document.getElementById('userForm').reset();
+  new bootstrap.Modal(document.getElementById('userModal')).show();
 }
 
-// ============================================================
-//  EXPORT EXCEL
-// ============================================================
-function exportProducts() {
-  if (!appData.products.length) { showToast('No products to export!','warning'); return; }
-  const data = appData.products.map(p => ({
-    'SKU':p.sku, 'Product Name':p.name, 'Category':p.category||'', 'Unit':p.unit,
-    'Quantity':p.quantity, 'Average Cost':+p.averageCost.toFixed(4),
-    'Total Value':+(p.quantity*p.averageCost).toFixed(2), 'Min Stock':p.minStock,
-    'Status':p.quantity<=p.minStock?'LOW STOCK':'OK'
-  }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  ws['!cols'] = [{wch:12},{wch:25},{wch:15},{wch:8},{wch:10},{wch:14},{wch:14},{wch:10},{wch:12}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Products');
-  XLSX.writeFile(wb, 'Products_'+getDateStamp()+'.xlsx');
-  showToast('Products exported!');
-}
+async function saveUser(e) {
+  e.preventDefault();
+  const pw1 = document.getElementById('uPassword').value;
+  const pw2 = document.getElementById('uPassword2').value;
+  if (pw1 !== pw2) { showToast('Passwords do not match', 'error'); return; }
 
-function exportTransactions() {
-  if (!appData.transactions.length) { showToast('No transactions!','warning'); return; }
-  const data = appData.transactions.map(tx => {
-    const prod = appData.products.find(p => p.id === tx.productId);
-    return { 'ID':tx.id, 'Date':tx.date, 'Product SKU':prod?prod.sku:'N/A',
-      'Product Name':prod?prod.name:'Deleted', 'Type':tx.type,
-      'Quantity':tx.type==='IN'?tx.quantity:-tx.quantity,
-      'Unit Cost':+tx.unitCost.toFixed(4), 'Total Cost':+tx.totalCost.toFixed(2),
-      'Avg Cost After':+(tx.avgCostAfter||0).toFixed(4),
-      'Stock After':tx.stockAfter||0, 'Notes':tx.notes||'', 'By':tx.by||'',
-      'Timestamp':tx.timestamp||'' };
-  });
-  const ws = XLSX.utils.json_to_sheet(data);
-  ws['!cols'] = [{wch:6},{wch:12},{wch:12},{wch:25},{wch:6},{wch:10},{wch:12},{wch:12},{wch:14},{wch:10},{wch:20},{wch:8},{wch:22}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
-  XLSX.writeFile(wb, 'Transactions_'+getDateStamp()+'.xlsx');
-  showToast('Transactions exported!');
-}
-
-function exportFullReport() {
-  if (!appData.products.length && !appData.transactions.length) { showToast('No data!','warning'); return; }
-  const wb = XLSX.utils.book_new();
-
-  // Summary
-  const summary = [
-    {'Metric':'Total Products','Value':appData.products.length},
-    {'Metric':'Total Quantity','Value':appData.products.reduce((s,p)=>s+p.quantity,0)},
-    {'Metric':'Total Inventory Value','Value':'$'+appData.products.reduce((s,p)=>s+p.quantity*p.averageCost,0).toFixed(2)},
-    {'Metric':'Total Transactions','Value':appData.transactions.length},
-    {'Metric':'Stock In Count','Value':appData.transactions.filter(t=>t.type==='IN').length},
-    {'Metric':'Stock Out Count','Value':appData.transactions.filter(t=>t.type==='OUT').length},
-    {'Metric':'Low Stock Items','Value':appData.products.filter(p=>p.quantity<=p.minStock).length},
-    {'Metric':'Report Date','Value':new Date().toLocaleDateString()}
-  ];
-  const ws1 = XLSX.utils.json_to_sheet(summary);
-  ws1['!cols']=[{wch:30},{wch:20}];
-  XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
-
-  if (appData.products.length) {
-    const pd = appData.products.map(p => ({'SKU':p.sku,'Name':p.name,'Category':p.category||'','Unit':p.unit,'Qty':p.quantity,'Avg Cost':+p.averageCost.toFixed(4),'Total Value':+(p.quantity*p.averageCost).toFixed(2),'Min Stock':p.minStock,'Status':p.quantity<=p.minStock?'LOW':'OK'}));
-    const ws2 = XLSX.utils.json_to_sheet(pd);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Products');
-  }
-  if (appData.transactions.length) {
-    const td = appData.transactions.map(tx => {const p=appData.products.find(x=>x.id===tx.productId);return{'ID':tx.id,'Date':tx.date,'Product':p?p.name:'Deleted','Type':tx.type,'Qty':tx.type==='IN'?tx.quantity:-tx.quantity,'Unit Cost':+tx.unitCost.toFixed(4),'Total':+tx.totalCost.toFixed(2),'Avg After':+(tx.avgCostAfter||0).toFixed(4),'Notes':tx.notes||'','By':tx.by||''};});
-    const ws3 = XLSX.utils.json_to_sheet(td);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Transactions');
-  }
-
-  XLSX.writeFile(wb, 'FullReport_'+getDateStamp()+'.xlsx');
-  showToast('Full report exported!');
-}
-
-// ============================================================
-//  SETTINGS ACTIONS
-// ============================================================
-function copyStaffLink() {
-  const link = document.getElementById('staffLink').textContent;
-  navigator.clipboard.writeText(link).then(() => showToast('Staff link copied!')).catch(() => {
-    const ta = document.createElement('textarea'); ta.value = link; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy'); ta.remove(); showToast('Staff link copied!');
-  });
-}
-
-async function apiLoadDemo() {
-  if (!confirm('This will CLEAR existing data and load demo data. Continue?')) return;
+  const btn = document.getElementById('btnSaveU');
+  btn.classList.add('btn-loading'); btn.disabled = true;
   try {
-    showLoadingOverlay(true, 'Loading demo data...');
-    const result = await apiPost('loadDemo', {});
-    if (result.success) {
-      showToast(result.message + ' 🎉');
-      await loadAllData();
-      refreshAllViews();
-    } else {
-      showToast(result.error || 'Failed', 'error');
-    }
-  } catch(err) {
-    showToast('Error: ' + err.message, 'error');
-  } finally {
-    showLoadingOverlay(false);
-  }
+    const d = {
+      username: document.getElementById('uUsername').value.trim(),
+      displayName: document.getElementById('uDisplayName').value.trim(),
+      password: pw1,
+      role: document.getElementById('uRole').value
+    };
+    const r = await apiPost('addUser', d);
+    if (r.success) {
+      showToast(r.message);
+      bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
+      loadUsers();
+    } else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
 }
 
-async function apiClearAll() {
-  if (!confirm('⚠️ Delete ALL products and transactions from Google Sheet?')) return;
-  if (!confirm('This CANNOT be undone. Are you sure?')) return;
+async function toggleUser(id) {
+  const u = usersData.find(x => x.id === id);
+  if (!u) return;
+  const action = u.status === 'active' ? 'disable' : 'enable';
+  if (!confirm(`${action.charAt(0).toUpperCase()+action.slice(1)} user "${u.username}"?`)) return;
   try {
-    const result = await apiPost('clearAll', {});
-    if (result.success) {
-      showToast('All data cleared', 'warning');
-      await loadAllData();
-      refreshAllViews();
-    } else {
-      showToast(result.error || 'Failed', 'error');
-    }
-  } catch(err) {
-    showToast('Error: ' + err.message, 'error');
-  }
+    const r = await apiPost('toggleUser', { userId: id });
+    if (r.success) { showToast(r.message); loadUsers(); }
+    else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
 }
+
+async function deleteUser(id, username) {
+  if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return;
+  try {
+    const r = await apiPost('deleteUser', { userId: id });
+    if (r.success) { showToast(r.message, 'warning'); loadUsers(); }
+    else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
+}
+
+// Reset password (admin resets another user's)
+function openResetPw(id, username) {
+  document.getElementById('rpUserId').value = id;
+  document.getElementById('rpUsername').textContent = username;
+  document.getElementById('rpNewPass').value = '';
+  new bootstrap.Modal(document.getElementById('resetPwModal')).show();
+}
+
+async function doResetPw(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnResetPw');
+  btn.classList.add('btn-loading'); btn.disabled = true;
+  try {
+    const r = await apiPost('resetPassword', {
+      userId: parseInt(document.getElementById('rpUserId').value),
+      newPassword: document.getElementById('rpNewPass').value
+    });
+    if (r.success) {
+      showToast(r.message);
+      bootstrap.Modal.getInstance(document.getElementById('resetPwModal')).hide();
+    } else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
+}
+
+// Change own password
+function openChangePasswordModal() {
+  toggleUserMenu(false);
+  document.getElementById('cpOldPass').value = '';
+  document.getElementById('cpNewPass').value = '';
+  document.getElementById('cpNewPass2').value = '';
+  new bootstrap.Modal(document.getElementById('changePwModal')).show();
+}
+
+async function doChangePw(e) {
+  e.preventDefault();
+  const np = document.getElementById('cpNewPass').value;
+  const np2 = document.getElementById('cpNewPass2').value;
+  if (np !== np2) { showToast('Passwords do not match', 'error'); return; }
+
+  const btn = document.getElementById('btnChangePw');
+  btn.classList.add('btn-loading'); btn.disabled = true;
+  try {
+    const r = await apiPost('changePassword', {
+      oldPassword: document.getElementById('cpOldPass').value,
+      newPassword: np
+    });
+    if (r.success) {
+      showToast(r.message);
+      bootstrap.Modal.getInstance(document.getElementById('changePwModal')).hide();
+    } else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
+}
+
+// ============================================================
+//  EXPORT
+// ============================================================
+function exportProducts(){
+  if(!appData.products.length){showToast('No data','warning');return;}
+  const d=appData.products.map(p=>({'SKU':p.sku,'Name':p.name,'Category':p.category||'','Unit':p.unit,'Qty':p.quantity,'Avg Cost':+p.averageCost.toFixed(4),'Value':+(p.quantity*p.averageCost).toFixed(2),'Min Stock':p.minStock,'Status':p.quantity<=p.minStock?'LOW':'OK'}));
+  const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Products');XLSX.writeFile(wb,'Products_'+ds()+'.xlsx');showToast('Exported!');
+}
+function exportTx(){
+  if(!appData.transactions.length){showToast('No data','warning');return;}
+  const d=appData.transactions.map(tx=>{const p=appData.products.find(x=>x.id===tx.productId);return{'Date':tx.date,'Product':p?p.name:'?','Type':tx.type,'Qty':tx.type==='IN'?tx.quantity:-tx.quantity,'Unit Cost':+tx.unitCost.toFixed(4),'Total':+tx.totalCost.toFixed(2),'Avg After':+(tx.avgCostAfter||0).toFixed(4),'Notes':tx.notes||'','By':tx.by||''};});
+  const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Transactions');XLSX.writeFile(wb,'Transactions_'+ds()+'.xlsx');showToast('Exported!');
+}
+function exportFull(){
+  const wb=XLSX.utils.book_new();
+  const s=[{'Metric':'Products','Value':appData.products.length},{'Metric':'Total Qty','Value':appData.products.reduce((a,p)=>a+p.quantity,0)},{'Metric':'Total Value','Value':'$'+appData.products.reduce((a,p)=>a+p.quantity*p.averageCost,0).toFixed(2)},{'Metric':'Transactions','Value':appData.transactions.length},{'Metric':'Date','Value':new Date().toLocaleDateString()}];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s),'Summary');
+  if(appData.products.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(appData.products.map(p=>({'SKU':p.sku,'Name':p.name,'Qty':p.quantity,'Avg Cost':+p.averageCost.toFixed(4),'Value':+(p.quantity*p.averageCost).toFixed(2)}))),'Products');
+  if(appData.transactions.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(appData.transactions.map(tx=>{const p=appData.products.find(x=>x.id===tx.productId);return{'Date':tx.date,'Product':p?p.name:'?','Type':tx.type,'Qty':tx.quantity,'Cost':+tx.totalCost.toFixed(2),'By':tx.by};})),'Transactions');
+  XLSX.writeFile(wb,'FullReport_'+ds()+'.xlsx');showToast('Exported!');
+}
+
+// ============================================================
+//  SETTINGS
+// ============================================================
+function updateSettings() {
+  document.getElementById('dispApi').textContent = API_URL;
+  const base = location.origin + location.pathname;
+  const staffUrl = base + '?api=' + btoa(API_URL);
+  document.getElementById('staffLink').textContent = staffUrl;
+}
+
+function copyLink() {
+  const l=document.getElementById('staffLink').textContent;
+  navigator.clipboard.writeText(l).then(()=>showToast('Copied!')).catch(()=>{const t=document.createElement('textarea');t.value=l;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();showToast('Copied!');});
+}
+
+async function testConn(){try{setSync('loading','Testing...');const r=await apiGet('validateToken');if(r.success){setSync('online','OK');showToast('✅ Connected');}else throw new Error(r.error);}catch(ex){setSync('error','Failed');showToast('❌ '+ex.message,'error');}}
+
+async function apiLoadDemo(){if(!confirm('Replace all data with demo data?'))return;try{showLoading(true,'Loading demo...');const r=await apiPost('loadDemo');if(r.success){showToast(r.message+' 🎉');await loadAllData();refreshAllViews();}else showToast(r.error,'error');}catch(ex){showToast(ex.message,'error');}finally{showLoading(false);}}
+async function apiClearAll(){if(!confirm('⚠️ Delete ALL inventory data?'))return;if(!confirm('This cannot be undone. Sure?'))return;try{const r=await apiPost('clearAll');if(r.success){showToast(r.message,'warning');await loadAllData();refreshAllViews();}else showToast(r.error,'error');}catch(ex){showToast(ex.message,'error');}}
 
 // ============================================================
 //  UTILITY
 // ============================================================
-function escHtml(str) {
-  const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML;
-}
-function getDateStamp() { return new Date().toISOString().split('T')[0].replace(/-/g,''); }
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function ds(){return new Date().toISOString().split('T')[0].replace(/-/g,'');}
 
 // ============================================================
 //  STARTUP
 // ============================================================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   if (!API_URL) {
-    // Show setup screen
-    document.getElementById('loadingOverlay').classList.add('hidden');
+    // No API configured - show setup
     document.getElementById('setupScreen').classList.remove('hidden');
-  } else {
-    // Has API URL - proceed
-    document.getElementById('setupScreen').classList.add('hidden');
-    initApp();
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    return;
+  }
+
+  // Has API URL
+  document.getElementById('setupScreen').classList.add('hidden');
+
+  if (!SESSION || !SESSION.token) {
+    // No session - show login
+    showLogin();
+    return;
+  }
+
+  // Has session - validate token
+  document.getElementById('loginScreen').classList.add('hidden');
+  showLoading(true, 'Validating session...');
+  try {
+    const r = await apiGet('validateToken');
+    if (r.success) {
+      SESSION.user = r.user; // refresh user info
+      localStorage.setItem('invSession', JSON.stringify(SESSION));
+      showLoading(false);
+      initApp();
+    } else {
+      SESSION = null;
+      localStorage.removeItem('invSession');
+      showLogin();
+    }
+  } catch(ex) {
+    showLoading(false);
+    showLogin();
   }
 });
 </script>
