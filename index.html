@@ -8,6 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{--sidebar-width:260px;--primary:#4361ee;--primary-dark:#3a56d4;--success:#2ec4b6;--danger:#e63946;--warning:#f77f00;--dark:#1a1a2e;--darker:#16162a;--light-bg:#f0f2f5;--card-bg:#fff;--text-primary:#1a1a2e;--text-secondary:#6c757d;--border-color:#e0e0e0}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -127,6 +128,26 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   .page-content{padding:16px}.top-header{padding:12px 16px}
   .stat-card .stat-value{font-size:22px}
 }
+
+/* ===== BATCH MODE ===== */
+.mode-toggle{display:flex;background:#f0f2f5;border-radius:10px;padding:4px;gap:4px;}
+.mode-btn{flex:1;padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--text-secondary);}
+.mode-btn.active{background:#fff;color:var(--text-primary);box-shadow:0 1px 4px rgba(0,0,0,.12);}
+.batch-table{width:100%;border-collapse:collapse;font-size:13px;}
+.batch-table th{background:#f8f9fa;padding:9px 10px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-secondary);border-bottom:2px solid var(--border-color);white-space:nowrap;}
+.batch-table td{padding:6px 6px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.batch-table .form-control,.batch-table .form-select{padding:6px 10px;font-size:13px;border-radius:7px;}
+.batch-row-num{width:28px;height:28px;border-radius:50%;background:#f0f2f5;color:var(--text-secondary);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.batch-total-row{background:#f8f9fa;font-weight:700;}
+.batch-progress{height:4px;border-radius:2px;background:#e0e0e0;overflow:hidden;margin-bottom:12px;display:none;}
+.batch-progress-bar{height:100%;background:var(--primary);transition:width .3s;border-radius:2px;}
+.batch-result-ok{color:#2e7d32;font-size:12px;}
+.batch-result-err{color:var(--danger);font-size:12px;}
+.btn-icon-sm{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border-color);background:#fff;color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all .2s;}
+.btn-icon-sm:hover{background:#fce4ec;color:var(--danger);border-color:var(--danger);}
+.batch-summary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.batch-summary .s-val{font-size:22px;font-weight:700;line-height:1;}
+.batch-summary .s-lbl{font-size:11px;opacity:.75;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -191,6 +212,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <div class="nav-section">Operations</div>
     <a class="nav-item" data-page="stockin" onclick="showPage('stockin')"><i class="bi bi-plus-circle-fill"></i> Stock In</a>
     <a class="nav-item" data-page="stockout" onclick="showPage('stockout')"><i class="bi bi-dash-circle-fill"></i> Stock Out</a>
+    <a class="nav-item" data-page="balance" onclick="showPage('balance')"><i class="bi bi-clipboard2-check-fill"></i> Balance Stock</a>
+    <a class="nav-item admin-only" data-page="adjust" onclick="showPage('adjust')"><i class="bi bi-arrow-left-right"></i> Adjustment</a>
     <div class="nav-section admin-only">Reports</div>
     <a class="nav-item admin-only" data-page="transactions" onclick="showPage('transactions')"><i class="bi bi-clock-history"></i> Transactions</a>
     <a class="nav-item admin-only" data-page="export" onclick="showPage('export')"><i class="bi bi-file-earmark-excel-fill"></i> Export Excel</a>
@@ -232,12 +255,48 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="row g-3 mb-4">
+      <!-- Row 1: Inventory stats -->
+      <div class="row g-3 mb-3">
         <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#eef2ff;color:var(--primary);"><i class="bi bi-box-seam-fill"></i></div><div class="stat-value" id="statProducts">0</div><div class="stat-label">Products</div></div></div>
         <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#e8f5e9;color:#2e7d32;"><i class="bi bi-stack"></i></div><div class="stat-value" id="statTotalQty">0</div><div class="stat-label">Total Qty</div></div></div>
-        <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#fff3e0;color:#e65100;"><i class="bi bi-cash-stack"></i></div><div class="stat-value" id="statTotalValue">$0</div><div class="stat-label">Total Value</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#fff3e0;color:#e65100;"><i class="bi bi-cash-stack"></i></div><div class="stat-value" id="statTotalValue">$0</div><div class="stat-label">Stock Value</div></div></div>
         <div class="col-6 col-lg-3"><div class="stat-card"><div class="icon-box" style="background:#fce4ec;color:#c62828;"><i class="bi bi-exclamation-triangle-fill"></i></div><div class="stat-value" id="statLowStock">0</div><div class="stat-label">Low Stock</div></div></div>
       </div>
+      <!-- Row 2: Sales stats (from Balance Stock) -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="stat-card" style="border-left:4px solid #2ec4b6;"><div class="icon-box" style="background:#e0faf7;color:#2ec4b6;"><i class="bi bi-graph-up-arrow"></i></div><div class="stat-value" id="statSalesToday" style="color:#2ec4b6;">$0</div><div class="stat-label">Sales Today <small class="text-muted d-block" id="statSalesTodayQty"></small></div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card" style="border-left:4px solid #4361ee;"><div class="icon-box" style="background:#eef2ff;color:#4361ee;"><i class="bi bi-calendar-month"></i></div><div class="stat-value" id="statSalesMonth" style="color:#4361ee;">$0</div><div class="stat-label">Sales This Month <small class="text-muted d-block" id="statSalesMonthQty"></small></div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card" style="border-left:4px solid #f77f00;"><div class="icon-box" style="background:#fff3e0;color:#f77f00;"><i class="bi bi-clipboard2-check"></i></div><div class="stat-value" id="statBalanceCount">0</div><div class="stat-label">Balance Entries Today</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card" style="border-left:4px solid #9b5de5;"><div class="icon-box" style="background:#f3e5f5;color:#9b5de5;"><i class="bi bi-box-arrow-in-down-right"></i></div><div class="stat-value" id="statSoldQtyToday">0</div><div class="stat-label">Units Sold Today</div></div></div>
+      </div>
+      <!-- Charts Row -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+          <div class="content-card" style="height:100%;">
+            <div class="card-header">
+              <h6><i class="bi bi-bar-chart-fill text-primary me-2"></i>Stock Movement — Last 30 Days</h6>
+              <span class="text-muted" style="font-size:12px;" id="chartDateRange"></span>
+            </div>
+            <div class="card-body" style="position:relative;height:220px;">
+              <canvas id="chartMovement"></canvas>
+              <div id="chartMovementEmpty" class="text-center text-muted py-4" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"><i class="bi bi-bar-chart" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">No transactions yet</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="content-card" style="height:100%;">
+            <div class="card-header">
+              <h6><i class="bi bi-pie-chart-fill text-warning me-2"></i>Value by Category</h6>
+              <span class="text-muted" style="font-size:12px;" id="pieTotal"></span>
+            </div>
+            <div class="card-body" style="position:relative;height:220px;display:flex;align-items:center;justify-content:center;">
+              <canvas id="chartCategory" style="max-height:210px;"></canvas>
+              <div id="chartCategoryEmpty" class="text-center text-muted" style="display:none;"><i class="bi bi-pie-chart" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">No data yet</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Low Stock + Recent -->
       <div class="row g-4">
         <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-exclamation-triangle text-warning me-2"></i>Low Stock</h6></div><div class="card-body" id="lowStockList"></div></div></div>
         <div class="col-lg-6"><div class="content-card"><div class="card-header"><h6><i class="bi bi-clock-history text-primary me-2"></i>Recent</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>By</th></tr></thead><tbody id="recentTransBody"></tbody></table></div></div></div></div>
@@ -247,39 +306,342 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <!-- PRODUCTS -->
     <div class="page" id="page-products">
       <div class="content-card"><div class="card-header">
-        <div class="search-box" style="width:280px;"><i class="bi bi-search"></i><input type="text" class="form-control" placeholder="Search..." id="productSearch" oninput="renderProducts()"></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="search-box" style="width:220px;"><i class="bi bi-search"></i><input type="text" class="form-control" placeholder="Search..." id="productSearch" oninput="renderProducts()"></div>
+          <select class="form-select form-select-sm" id="productCatFilter" style="width:160px;" onchange="renderProducts()">
+            <option value="">All categories</option>
+          </select>
+          <button class="btn btn-outline-secondary btn-sm" id="clearProdFilter" onclick="clearProductFilter()" style="display:none;" title="Clear filters"><i class="bi bi-x-circle me-1"></i>Clear</button>
+        </div>
         <button class="btn btn-primary btn-sm admin-only" id="addProductBtn" onclick="openProductModal()"><i class="bi bi-plus-lg me-1"></i>Add Product</button>
-      </div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Qty</th><th>Avg Cost</th><th>Value</th><th>Status</th><th class="admin-only">Actions</th></tr></thead><tbody id="productsTableBody"></tbody></table></div></div></div>
+      </div><div class="card-body p-0"><div class="table-responsive"><table class="data-table"><thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Qty</th><th>Avg Cost</th><th>Sell Price</th><th>Margin</th><th>Value</th><th>Status</th><th class="admin-only">Actions</th></tr></thead><tbody id="productsTableBody"></tbody></table></div></div></div>
     </div>
 
     <!-- STOCK IN -->
     <div class="page" id="page-stockin">
-      <div class="row g-4"><div class="col-lg-7"><div class="content-card"><div class="card-header"><h6><i class="bi bi-plus-circle text-success me-2"></i>Stock In</h6></div><div class="card-body">
-        <form id="stockInForm" onsubmit="processStockIn(event)">
-          <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="siProduct" required onchange="updateSIInfo()"><option value="">-- Select --</option></select></div>
-          <div class="row g-3 mb-3"><div class="col-6"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="siQty" min="1" required oninput="calcSI()"></div><div class="col-6"><label class="form-label">Unit Cost ($) *</label><input type="number" class="form-control" id="siCost" min="0" step="0.01" required oninput="calcSI()"></div></div>
-          <div class="mb-3"><label class="form-label">Total Cost</label><input type="text" class="form-control" id="siTotal" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
-          <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="siDate"></div>
-          <div class="mb-3"><label class="form-label">Notes</label><input type="text" class="form-control" id="siNotes" placeholder="Optional..."></div>
-          <button type="submit" class="btn btn-success w-100 py-2" id="btnSI"><i class="bi bi-plus-circle me-2"></i>Confirm Stock In</button>
-        </form>
-      </div></div></div>
-      <div class="col-lg-5"><div class="content-card"><div class="card-header"><h6>Stock Info</h6></div><div class="card-body" id="siInfo"></div></div></div></div>
+
+      <!-- Mode Toggle -->
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="mode-toggle" style="width:240px;">
+          <button class="mode-btn active" id="siModeBtn-single" onclick="setSIMode('single')"><i class="bi bi-1-circle me-1"></i>Single</button>
+          <button class="mode-btn" id="siModeBtn-batch" onclick="setSIMode('batch')"><i class="bi bi-table me-1"></i>Batch</button>
+        </div>
+        <span class="text-muted small" id="siModeHint">Enter one product at a time</span>
+      </div>
+
+      <!-- SINGLE MODE -->
+      <div id="siSingleMode">
+        <div class="row g-4"><div class="col-lg-7"><div class="content-card"><div class="card-header"><h6><i class="bi bi-plus-circle text-success me-2"></i>Stock In</h6></div><div class="card-body">
+          <form id="stockInForm" onsubmit="processStockIn(event)">
+            <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="siProduct" required onchange="updateSIInfo()"><option value="">-- Select --</option></select></div>
+            <div class="row g-3 mb-3"><div class="col-6"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="siQty" min="1" required oninput="calcSI()"></div><div class="col-6"><label class="form-label">Unit Cost ($) *</label><input type="number" class="form-control" id="siCost" min="0" step="0.01" required oninput="calcSI()"></div></div>
+            <div class="mb-3"><label class="form-label">Total Cost</label><input type="text" class="form-control" id="siTotal" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
+            <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="siDate"></div>
+            <div class="mb-3"><label class="form-label">Notes</label><input type="text" class="form-control" id="siNotes" placeholder="Optional..."></div>
+            <button type="submit" class="btn btn-success w-100 py-2" id="btnSI"><i class="bi bi-plus-circle me-2"></i>Confirm Stock In</button>
+          </form>
+        </div></div></div>
+        <div class="col-lg-5"><div class="content-card"><div class="card-header"><h6>Stock Info</h6></div><div class="card-body" id="siInfo"></div></div></div></div>
+      </div>
+
+      <!-- BATCH MODE (Stock In) -->
+      <div id="siBatchMode" style="display:none;">
+        <div class="content-card mb-3">
+          <div class="card-header">
+            <h6><i class="bi bi-table text-success me-2"></i>Batch Stock In</h6>
+            <div class="d-flex gap-2">
+              <input type="date" class="form-control form-control-sm" style="width:150px;" id="bsiDate">
+              <button class="btn btn-outline-secondary btn-sm" onclick="addBSIRow()"><i class="bi bi-plus-lg me-1"></i>Add Row</button>
+              <button class="btn btn-success btn-sm" id="btnBSI" onclick="processBatchStockIn()"><i class="bi bi-check2-all me-1"></i>Submit All</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="batch-progress" id="bsiProgress"><div class="batch-progress-bar" id="bsiProgressBar"></div></div>
+            <!-- Batch summary bar -->
+            <div class="batch-summary mb-3" id="bsiSummary">
+              <div class="text-center"><div class="s-val" id="bsiSumRows">0</div><div class="s-lbl">Rows</div></div>
+              <div class="text-center"><div class="s-val" id="bsiSumQty">0</div><div class="s-lbl">Total Qty</div></div>
+              <div class="text-center"><div class="s-val" id="bsiSumVal">$0.00</div><div class="s-lbl">Total Value</div></div>
+            </div>
+            <div class="table-responsive">
+              <table class="batch-table" id="bsiTable">
+                <thead><tr>
+                  <th style="width:32px;">#</th>
+                  <th>Product *</th>
+                  <th style="width:100px;">Qty *</th>
+                  <th style="width:120px;">Unit Cost *</th>
+                  <th style="width:100px;">Total</th>
+                  <th style="width:180px;">Notes</th>
+                  <th style="width:32px;"></th>
+                </tr></thead>
+                <tbody id="bsiBody"></tbody>
+                <tfoot><tr class="batch-total-row" id="bsiFooter">
+                  <td colspan="2" class="text-end pe-3 text-muted" style="font-size:12px;">TOTAL</td>
+                  <td id="bsiTotalQty">0</td>
+                  <td></td>
+                  <td id="bsiTotalVal">$0.00</td>
+                  <td colspan="2"></td>
+                </tr></tfoot>
+              </table>
+            </div>
+            <div class="mt-3" id="bsiResultLog" style="display:none;">
+              <div class="fw-bold small mb-2 text-muted">Results:</div>
+              <div id="bsiResultItems"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- STOCK OUT -->
     <div class="page" id="page-stockout">
-      <div class="row g-4"><div class="col-lg-7"><div class="content-card"><div class="card-header"><h6><i class="bi bi-dash-circle text-danger me-2"></i>Stock Out</h6></div><div class="card-body">
-        <form id="stockOutForm" onsubmit="processStockOut(event)">
-          <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="soProduct" required onchange="updateSOInfo()"><option value="">-- Select --</option></select></div>
-          <div class="mb-3"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="soQty" min="1" required oninput="calcSO()"></div>
-          <div class="mb-3"><label class="form-label">Cost Out</label><input type="text" class="form-control" id="soTotal" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
-          <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="soDate"></div>
-          <div class="mb-3"><label class="form-label">Notes</label><input type="text" class="form-control" id="soNotes" placeholder="e.g. Sold, Damaged..."></div>
-          <button type="submit" class="btn btn-danger w-100 py-2" id="btnSO"><i class="bi bi-dash-circle me-2"></i>Confirm Stock Out</button>
-        </form>
-      </div></div></div>
-      <div class="col-lg-5"><div class="content-card"><div class="card-header"><h6>Stock Info</h6></div><div class="card-body" id="soInfo"></div></div></div></div>
+
+      <!-- Mode Toggle -->
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="mode-toggle" style="width:240px;">
+          <button class="mode-btn active" id="soModeBtn-single" onclick="setSOMode('single')"><i class="bi bi-1-circle me-1"></i>Single</button>
+          <button class="mode-btn" id="soModeBtn-batch" onclick="setSOMode('batch')"><i class="bi bi-table me-1"></i>Batch</button>
+        </div>
+        <span class="text-muted small" id="soModeHint">Enter one product at a time</span>
+      </div>
+
+      <!-- SINGLE MODE -->
+      <div id="soSingleMode">
+        <div class="row g-4"><div class="col-lg-7"><div class="content-card"><div class="card-header"><h6><i class="bi bi-dash-circle text-danger me-2"></i>Stock Out</h6></div><div class="card-body">
+          <form id="stockOutForm" onsubmit="processStockOut(event)">
+            <div class="mb-3"><label class="form-label">Product *</label><select class="form-select" id="soProduct" required onchange="updateSOInfo()"><option value="">-- Select --</option></select></div>
+            <div class="mb-3"><label class="form-label">Quantity *</label><input type="number" class="form-control" id="soQty" min="1" required oninput="calcSO()"></div>
+            <div class="mb-3"><label class="form-label">Cost Out</label><input type="text" class="form-control" id="soTotal" readonly style="background:#f8f9fa;font-weight:700;font-size:18px;"></div>
+            <div class="mb-3"><label class="form-label">Date</label><input type="date" class="form-control" id="soDate"></div>
+            <div class="mb-3"><label class="form-label">Notes</label><input type="text" class="form-control" id="soNotes" placeholder="e.g. Sold, Damaged..."></div>
+            <button type="submit" class="btn btn-danger w-100 py-2" id="btnSO"><i class="bi bi-dash-circle me-2"></i>Confirm Stock Out</button>
+          </form>
+        </div></div></div>
+        <div class="col-lg-5"><div class="content-card"><div class="card-header"><h6>Stock Info</h6></div><div class="card-body" id="soInfo"></div></div></div></div>
+      </div>
+
+      <!-- BATCH MODE (Stock Out) -->
+      <div id="soBatchMode" style="display:none;">
+        <div class="content-card mb-3">
+          <div class="card-header">
+            <h6><i class="bi bi-table text-danger me-2"></i>Batch Stock Out</h6>
+            <div class="d-flex gap-2">
+              <input type="date" class="form-control form-control-sm" style="width:150px;" id="bsoDate">
+              <button class="btn btn-outline-secondary btn-sm" onclick="addBSORow()"><i class="bi bi-plus-lg me-1"></i>Add Row</button>
+              <button class="btn btn-danger btn-sm" id="btnBSO" onclick="processBatchStockOut()"><i class="bi bi-check2-all me-1"></i>Submit All</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="batch-progress" id="bsoProgress"><div class="batch-progress-bar" id="bsoProgressBar"></div></div>
+            <!-- Batch summary bar -->
+            <div class="batch-summary mb-3" id="bsoSummary" style="background:linear-gradient(135deg,#e63946,#c62828);">
+              <div class="text-center"><div class="s-val" id="bsoSumRows">0</div><div class="s-lbl">Rows</div></div>
+              <div class="text-center"><div class="s-val" id="bsoSumQty">0</div><div class="s-lbl">Total Qty</div></div>
+              <div class="text-center"><div class="s-val" id="bsoSumVal">$0.00</div><div class="s-lbl">Est. Cost Out</div></div>
+            </div>
+            <div class="table-responsive">
+              <table class="batch-table" id="bsoTable">
+                <thead><tr>
+                  <th style="width:32px;">#</th>
+                  <th>Product *</th>
+                  <th style="width:110px;">Qty * <small class="text-muted fw-normal">(avail)</small></th>
+                  <th style="width:110px;">Est. Cost Out</th>
+                  <th style="width:180px;">Notes</th>
+                  <th style="width:32px;"></th>
+                </tr></thead>
+                <tbody id="bsoBody"></tbody>
+                <tfoot><tr class="batch-total-row" id="bsoFooter">
+                  <td colspan="2" class="text-end pe-3 text-muted" style="font-size:12px;">TOTAL</td>
+                  <td id="bsoTotalQty">0</td>
+                  <td id="bsoTotalVal">$0.00</td>
+                  <td colspan="2"></td>
+                </tr></tfoot>
+              </table>
+            </div>
+            <div class="mt-3" id="bsoResultLog" style="display:none;">
+              <div class="fw-bold small mb-2 text-muted">Results:</div>
+              <div id="bsoResultItems"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BALANCE STOCK (Closing Count) -->
+    <div class="page" id="page-balance">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="content-card">
+            <div class="card-header">
+              <div>
+                <h6><i class="bi bi-clipboard2-check-fill text-success me-2"></i>Daily Closing — Balance Stock</h6>
+                <small class="text-muted">Enter physical count. System calculates sold = current stock − balance count.</small>
+              </div>
+              <div class="d-flex gap-2 align-items-center">
+                <input type="date" class="form-control form-control-sm" style="width:150px;" id="balDate">
+                <button class="btn btn-outline-secondary btn-sm" onclick="fillBalanceToday()"><i class="bi bi-arrow-clockwise me-1"></i>Reset</button>
+                <button class="btn btn-success btn-sm" id="btnBalSubmit" onclick="submitBalance()"><i class="bi bi-check2-all me-1"></i>Submit Closing</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Summary banner -->
+              <div id="balSummaryBanner" style="display:none;background:linear-gradient(135deg,#2ec4b6,#1a9e94);color:#fff;border-radius:10px;padding:14px 20px;margin-bottom:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div class="text-center"><div style="font-size:22px;font-weight:700;" id="balSumProducts">0</div><div style="font-size:11px;opacity:.8;">Products</div></div>
+                <div class="text-center"><div style="font-size:22px;font-weight:700;" id="balSumSoldQty">0</div><div style="font-size:11px;opacity:.8;">Units Sold</div></div>
+                <div class="text-center"><div style="font-size:22px;font-weight:700;" id="balSumSalesVal">$0</div><div style="font-size:11px;opacity:.8;">Est. Sales Value</div></div>
+                <div class="text-center"><div style="font-size:22px;font-weight:700;" id="balSumAdjusted">0</div><div style="font-size:11px;opacity:.8;">Stock Adjusted</div></div>
+              </div>
+
+              <!-- Quick filter -->
+              <div class="d-flex gap-2 mb-3 flex-wrap">
+                <div class="search-box" style="width:200px;"><i class="bi bi-search"></i><input type="text" class="form-control form-control-sm" id="balSearch" placeholder="Search product..." oninput="renderBalanceTable()"></div>
+                <select class="form-select form-select-sm" style="width:160px;" id="balCatFilter" onchange="renderBalanceTable()"><option value="">All categories</option></select>
+                <button class="btn btn-outline-secondary btn-sm" onclick="balFillAllCurrent()" title="Pre-fill all balance with current stock (no sales)"><i class="bi bi-magic me-1"></i>Fill no change</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="batch-table">
+                  <thead><tr>
+                    <th style="width:30px;">#</th>
+                    <th>Product</th>
+                    <th style="width:90px;text-align:center;">Current</th>
+                    <th style="width:110px;">Balance Count *</th>
+                    <th style="width:110px;">Selling Price *</th>
+                    <th style="width:80px;text-align:center;">Sold</th>
+                    <th style="width:110px;text-align:right;">Sales Value</th>
+                    <th style="width:140px;">Notes</th>
+                  </tr></thead>
+                  <tbody id="balBody"></tbody>
+                  <tfoot>
+                    <tr class="batch-total-row">
+                      <td colspan="3" class="text-end pe-3 text-muted" style="font-size:11px;">TOTAL</td>
+                      <td></td>
+                      <td></td>
+                      <td id="balTotalSold" style="text-align:center;font-weight:700;">0</td>
+                      <td id="balTotalVal" style="text-align:right;font-weight:700;">$0.00</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <div class="mt-3" id="balResultLog" style="display:none;">
+                <div class="fw-bold small mb-2 text-muted">Submission Results:</div>
+                <div id="balResultItems"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <!-- Today's summary card -->
+          <div class="content-card">
+            <div class="card-header"><h6><i class="bi bi-calendar-check me-2 text-primary"></i>Today's Balance History</h6></div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table" style="font-size:12px;">
+                  <thead><tr><th>Product</th><th>Count</th><th>Sold</th><th>By</th></tr></thead>
+                  <tbody id="balHistoryBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- WhatsApp low stock alert -->
+          <div class="content-card">
+            <div class="card-header">
+              <h6><i class="bi bi-whatsapp me-2" style="color:#25D366;"></i>Low Stock Alert</h6>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">Send to (WhatsApp number)</label>
+                <div class="d-flex gap-2">
+                  <input type="text" class="form-control form-control-sm" id="waSendNumber" placeholder="60123456789" value="">
+                  <button class="btn btn-sm btn-outline-secondary" onclick="saveWaNumber()"><i class="bi bi-floppy me-1"></i>Save</button>
+                </div>
+                <small class="text-muted">International format, no + sign</small>
+              </div>
+              <div id="waLowStockPreview" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;font-size:12px;font-family:monospace;white-space:pre-wrap;min-height:60px;color:#166534;margin-bottom:12px;"></div>
+              <button class="btn btn-success w-100" onclick="sendWhatsAppAlert()" id="btnWaSend">
+                <i class="bi bi-whatsapp me-2"></i>Open WhatsApp & Send
+              </button>
+              <small class="text-muted d-block text-center mt-2">Opens WhatsApp with pre-filled message</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STOCK ADJUSTMENT -->
+    <div class="page" id="page-adjust">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="content-card">
+            <div class="card-header">
+              <h6><i class="bi bi-arrow-left-right text-primary me-2"></i>Stock Adjustment</h6>
+              <span class="text-muted small">Admin only — sets stock to exact count</span>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-warning small mb-4" style="border-radius:10px;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Use this for physical count corrections. The difference will be recorded as an <strong>ADJUST</strong> transaction.
+              </div>
+              <form id="adjustForm" onsubmit="processAdjust(event)">
+                <div class="mb-3">
+                  <label class="form-label">Product *</label>
+                  <select class="form-select" id="adjProduct" required onchange="updateAdjInfo()"><option value="">-- Select product --</option></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Actual Count (physical) *</label>
+                  <input type="number" class="form-control" id="adjNewQty" min="0" required oninput="calcAdj()" placeholder="Enter actual counted quantity">
+                </div>
+                <div class="mb-3" id="adjDiffRow" style="display:none;">
+                  <label class="form-label">Difference</label>
+                  <div id="adjDiff" style="font-size:20px;font-weight:700;padding:10px 14px;background:#f8f9fa;border-radius:10px;border:1px solid var(--border-color);"></div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Reason *</label>
+                  <select class="form-select" id="adjReason" required>
+                    <option value="">-- Select reason --</option>
+                    <option value="Physical count">Physical count</option>
+                    <option value="Damaged goods">Damaged goods</option>
+                    <option value="Theft / loss">Theft / loss</option>
+                    <option value="Data entry error">Data entry error</option>
+                    <option value="Returned goods">Returned goods</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Notes</label>
+                  <input type="text" class="form-control" id="adjNotes" placeholder="Additional details...">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2" id="btnAdj"><i class="bi bi-arrow-left-right me-2"></i>Confirm Adjustment</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="content-card">
+            <div class="card-header"><h6>Current Stock Info</h6></div>
+            <div class="card-body" id="adjInfo">
+              <div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product</p></div>
+            </div>
+          </div>
+          <div class="content-card mt-0">
+            <div class="card-header"><h6><i class="bi bi-clock-history me-2 text-muted"></i>Recent Adjustments</h6></div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table" style="font-size:13px;">
+                  <thead><tr><th>Date</th><th>Product</th><th>Before</th><th>After</th><th>By</th></tr></thead>
+                  <tbody id="adjHistory"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TRANSACTIONS -->
@@ -287,7 +649,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       <div class="content-card"><div class="card-header">
         <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Transactions</h6>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <select class="form-select form-select-sm" style="width:120px;" id="txFType" onchange="renderTx()"><option value="">All</option><option value="IN">In</option><option value="OUT">Out</option></select>
+          <select class="form-select form-select-sm" style="width:120px;" id="txFType" onchange="renderTx()"><option value="">All</option><option value="IN">In</option><option value="OUT">Out</option><option value="ADJUST">Adjust</option><option value="BALANCE">Balance</option></select>
           <select class="form-select form-select-sm" style="width:160px;" id="txFProd" onchange="renderTx()"><option value="">All Products</option></select>
           <input type="date" class="form-control form-control-sm" style="width:140px;" id="txFFrom" onchange="renderTx()">
           <input type="date" class="form-control form-control-sm" style="width:140px;" id="txFTo" onchange="renderTx()">
@@ -337,6 +699,28 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           </select>
           <div class="mt-2 small text-muted" id="lastRefresh">--</div>
         </div></div></div>
+        <!-- WhatsApp Alerts -->
+        <div class="col-12"><div class="content-card"><div class="card-header">
+          <h6><i class="bi bi-whatsapp me-2" style="color:#25D366;"></i>WhatsApp Low Stock Alert</h6>
+          <span class="badge" style="background:#25D366;font-size:11px;">Manual Send</span>
+        </div><div class="card-body">
+          <div class="alert alert-info small mb-3" style="border-radius:10px;">
+            <i class="bi bi-info-circle me-2"></i>
+            Configure the default phone number for low stock alerts. You can also change the number directly on the <strong>Balance Stock</strong> page when sending.
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Default WhatsApp Number <small class="text-muted">(international, no +)</small></label>
+              <div class="d-flex gap-2">
+                <input type="text" class="form-control" id="waDefaultNumber" placeholder="60123456789">
+                <button class="btn btn-success px-4" onclick="saveWaDefaultNumber()"><i class="bi bi-floppy me-1"></i>Save</button>
+              </div>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <button class="btn btn-outline-success" onclick="showPage('balance')"><i class="bi bi-box-arrow-up-right me-2"></i>Go to Balance Stock → Send Alert</button>
+            </div>
+          </div>
+        </div></div></div>
       </div>
     </div>
 
@@ -351,7 +735,22 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <div class="mb-3"><label class="form-label">SKU *</label><input type="text" class="form-control" id="pSku" required></div>
     <div class="mb-3"><label class="form-label">Name *</label><input type="text" class="form-control" id="pName" required></div>
     <div class="mb-3"><label class="form-label">Category</label><input type="text" class="form-control" id="pCat"></div>
-    <div class="row g-3"><div class="col-6"><label class="form-label">Unit</label><input type="text" class="form-control" id="pUnit" value="pcs"></div><div class="col-6"><label class="form-label">Min Stock</label><input type="number" class="form-control" id="pMin" value="10" min="0"></div></div>
+    <div class="row g-3 mb-3">
+      <div class="col-6"><label class="form-label">Unit</label><input type="text" class="form-control" id="pUnit" value="pcs"></div>
+      <div class="col-6"><label class="form-label">Min Stock</label><input type="number" class="form-control" id="pMin" value="10" min="0"></div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Selling Price <small class="text-muted">(auto-filled in Balance Stock)</small></label>
+      <div style="position:relative;">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-secondary);font-weight:600;">$</span>
+        <input type="number" class="form-control" id="pSellingPrice" min="0" step="0.01" placeholder="0.00" style="padding-left:28px;">
+      </div>
+    </div>
+    <!-- Price history panel (shown in edit mode only) -->
+    <div id="pPriceHistory" style="display:none;">
+      <label class="form-label">Price History</label>
+      <div id="pPriceHistoryList" style="background:#f8f9fa;border-radius:10px;padding:10px 14px;font-size:12px;max-height:140px;overflow-y:auto;"></div>
+    </div>
   </div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" id="btnSaveP">Save</button></div></form>
 </div></div></div>
 
@@ -396,7 +795,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 // ============================================================
 let API_URL = localStorage.getItem('invApiUrl') || '';
 let SESSION = JSON.parse(localStorage.getItem('invSession') || 'null'); // {token, user:{id,username,role,displayName}}
-let appData = { products:[], transactions:[] };
+let appData = { products:[], transactions:[], priceHistory:[] };
 let usersData = [];
 let refreshTimer = null;
 
@@ -574,7 +973,7 @@ async function loadAllData() {
   try {
     const r = await apiGet('getAll');
     if (r.success) {
-      appData = { products: r.products||[], transactions: r.transactions||[] };
+      appData = { products: r.products||[], transactions: r.transactions||[], priceHistory: r.priceHistory||[] };
       setSync('online','Synced');
       document.getElementById('lastRefresh').textContent = 'Last: '+new Date().toLocaleTimeString();
     } else throw new Error(r.error);
@@ -611,7 +1010,7 @@ function setRefresh() {
 // ============================================================
 function showPage(p) {
   const role = SESSION ? SESSION.user.role : 'staff';
-  const adminPages = ['dashboard','transactions','export','users','settings'];
+  const adminPages = ['dashboard','transactions','export','users','settings','adjust'];
   if (role !== 'admin' && adminPages.includes(p)) p = 'stockin';
 
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
@@ -621,14 +1020,17 @@ function showPage(p) {
   if (pg) pg.classList.add('active');
   if (nv) nv.classList.add('active');
 
-  const titles = {dashboard:'Dashboard',products:'Products',stockin:'Stock In',stockout:'Stock Out',transactions:'Transactions',export:'Export',users:'User Management',settings:'Settings'};
+  const titles = {dashboard:'Dashboard',products:'Products',stockin:'Stock In',stockout:'Stock Out',balance:'Balance Stock',adjust:'Stock Adjustment',transactions:'Transactions',export:'Export',users:'User Management',settings:'Settings'};
   document.getElementById('pageTitle').textContent = titles[p]||p;
 
   if (p==='dashboard') refreshDash();
   if (p==='products') renderProducts();
   if (p==='stockin'||p==='stockout') populateSelects();
+  if (p==='balance') initBalancePage();
+  if (p==='adjust') { populateAdjSelect(); renderAdjHistory(); }
   if (p==='transactions') { populateTxF(); renderTx(); }
   if (p==='users') loadUsers();
+  if (p==='settings') { updateSettings(); loadWaDefaultNumber(); }
 
   if (window.innerWidth<=768) toggleSidebar(false);
 }
@@ -668,71 +1070,719 @@ function showToast(msg,type='success') {
 // ============================================================
 function refreshAllViews() {
   refreshDash();
+  refreshCategoryFilter();
   renderProducts();
   document.getElementById('productCount').textContent = appData.products.length;
 }
 
 // ============================================================
-//  DASHBOARD
+//  DASHBOARD + CHARTS
 // ============================================================
-function refreshDash() {
-  const P=appData.products;
-  document.getElementById('statProducts').textContent=P.length;
-  document.getElementById('statTotalQty').textContent=P.reduce((s,p)=>s+p.quantity,0).toLocaleString();
-  document.getElementById('statTotalValue').textContent='$'+P.reduce((s,p)=>s+p.quantity*p.averageCost,0).toFixed(2);
-  const ls=P.filter(p=>p.quantity<=p.minStock);
-  document.getElementById('statLowStock').textContent=ls.length;
-  document.getElementById('lowStockList').innerHTML = ls.length===0
-    ? '<div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All healthy</p></div>'
-    : ls.map(p=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;"><div><strong>${esc(p.name)}</strong><br><small class="text-muted">${esc(p.sku)}</small></div><div class="text-end"><span class="badge-low">${p.quantity} ${esc(p.unit)}</span><br><small class="text-muted">Min: ${p.minStock}</small></div></div>`).join('');
+let _chartMovement = null;
+let _chartCategory = null;
 
-  const rec=[...appData.transactions].reverse().slice(0,8);
-  document.getElementById('recentTransBody').innerHTML = rec.length===0
+function refreshDash() {
+  const P = appData.products;
+  const today = new Date().toISOString().split('T')[0];
+  const monthPrefix = today.slice(0,7); // YYYY-MM
+
+  document.getElementById('statProducts').textContent = P.length;
+  document.getElementById('statTotalQty').textContent = P.reduce((s,p) => s+p.quantity, 0).toLocaleString();
+  document.getElementById('statTotalValue').textContent = '$' + P.reduce((s,p) => s+p.quantity*p.averageCost, 0).toFixed(2);
+  const ls = P.filter(p => p.quantity <= p.minStock);
+  document.getElementById('statLowStock').textContent = ls.length;
+
+  // Sales from BALANCE transactions (sold = negative diff recorded as negative qty)
+  const balanceTx = appData.transactions.filter(tx => tx.type === 'BALANCE');
+  const todayBal  = balanceTx.filter(tx => tx.date === today);
+  const monthBal  = balanceTx.filter(tx => tx.date && tx.date.startsWith(monthPrefix));
+
+  // quantity in BALANCE tx is stored as negative (sold units). We take abs.
+  const todaySoldQty = todayBal.reduce((s,tx) => s + Math.abs(tx.quantity), 0);
+  const todaySalesVal= todayBal.reduce((s,tx) => s + Math.abs(tx.totalCost), 0);
+  const monthSoldQty = monthBal.reduce((s,tx) => s + Math.abs(tx.quantity), 0);
+  const monthSalesVal= monthBal.reduce((s,tx) => s + Math.abs(tx.totalCost), 0);
+
+  document.getElementById('statSalesToday').textContent    = '$' + todaySalesVal.toFixed(2);
+  document.getElementById('statSalesTodayQty').textContent = todaySoldQty > 0 ? todaySoldQty + ' units sold' : '';
+  document.getElementById('statSalesMonth').textContent    = '$' + monthSalesVal.toFixed(2);
+  document.getElementById('statSalesMonthQty').textContent = monthSoldQty > 0 ? monthSoldQty + ' units' : '';
+  document.getElementById('statBalanceCount').textContent  = todayBal.length;
+  document.getElementById('statSoldQtyToday').textContent  = todaySoldQty;
+
+  document.getElementById('lowStockList').innerHTML = ls.length === 0
+    ? '<div class="text-center text-muted py-3"><i class="bi bi-check-circle" style="font-size:30px;opacity:.3;"></i><p class="mt-2 mb-0 small">All healthy</p></div>'
+    : ls.map(p => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;"><div><strong>${esc(p.name)}</strong><br><small class="text-muted">${esc(p.sku)}</small></div><div class="text-end"><span class="badge-low">${p.quantity} ${esc(p.unit)}</span><br><small class="text-muted">Min: ${p.minStock}</small></div></div>`).join('');
+
+  const rec = [...appData.transactions].reverse().slice(0,8);
+  document.getElementById('recentTransBody').innerHTML = rec.length === 0
     ? '<tr><td colspan="5" class="text-center text-muted py-4">No transactions</td></tr>'
-    : rec.map(tx=>{const p=appData.products.find(x=>x.id===tx.productId);return`<tr><td>${tx.date}</td><td>${p?esc(p.name):'?'}</td><td><span class="badge-${tx.type==='IN'?'in':'out'}">${tx.type==='IN'?'▲ IN':'▼ OUT'}</span></td><td>${tx.quantity}</td><td>${esc(tx.by||'-')}</td></tr>`;}).join('');
+    : rec.map(tx => {
+        const p = appData.products.find(x => x.id===tx.productId);
+        const typeMap = { IN:'▲ IN', OUT:'▼ OUT', ADJUST:'↔ ADJ', BALANCE:'📋 BAL' };
+        const clsMap  = { IN:'in', OUT:'out', ADJUST:'low', BALANCE:'ok' };
+        return `<tr><td>${tx.date}</td><td>${p?esc(p.name):'?'}</td><td><span class="badge-${clsMap[tx.type]||'low'}">${typeMap[tx.type]||tx.type}</span></td><td>${Math.abs(tx.quantity)}</td><td>${esc(tx.by||'-')}</td></tr>`;
+      }).join('');
+
+  renderMovementChart();
+  renderCategoryChart();
+}
+
+function renderMovementChart() {
+  // Build 30-day date array
+  const days = 30;
+  const labels = [], inMap = {}, outMap = {};
+  for (let i = days-1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const key = d.toISOString().split('T')[0];
+    labels.push(key);
+    inMap[key] = 0; outMap[key] = 0;
+  }
+
+  const cutoff = labels[0];
+  let hasData = false;
+  appData.transactions.forEach(tx => {
+    if (tx.date < cutoff) return;
+    if (tx.type === 'IN'  && inMap[tx.date]  !== undefined) { inMap[tx.date]  += tx.quantity; hasData = true; }
+    if (tx.type === 'OUT' && outMap[tx.date] !== undefined) { outMap[tx.date] += tx.quantity; hasData = true; }
+  });
+
+  const emptyEl = document.getElementById('chartMovementEmpty');
+  const canvas  = document.getElementById('chartMovement');
+  emptyEl.style.display  = hasData ? 'none' : 'block';
+  canvas.style.display   = hasData ? 'block' : 'none';
+  if (!hasData) return;
+
+  // Short labels (MM/DD)
+  const shortLabels = labels.map(d => d.slice(5));
+  document.getElementById('chartDateRange').textContent = shortLabels[0] + ' – ' + shortLabels[shortLabels.length-1];
+
+  const cfg = {
+    type: 'bar',
+    data: {
+      labels: shortLabels,
+      datasets: [
+        { label: 'Stock In',  data: labels.map(d => inMap[d]),  backgroundColor: 'rgba(46,196,182,0.75)', borderRadius: 3 },
+        { label: 'Stock Out', data: labels.map(d => outMap[d]), backgroundColor: 'rgba(230,57,70,0.65)',  borderRadius: 3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position:'top', labels:{ boxWidth:12, font:{size:11} } } },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ font:{size:10}, maxTicksLimit:10, maxRotation:0 } },
+        y: { grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ font:{size:11} }, beginAtZero:true }
+      }
+    }
+  };
+  if (_chartMovement) { _chartMovement.data = cfg.data; _chartMovement.update(); }
+  else { _chartMovement = new Chart(canvas.getContext('2d'), cfg); }
+}
+
+function renderCategoryChart() {
+  const P = appData.products;
+  const catMap = {};
+  P.forEach(p => {
+    const cat = p.category || 'Uncategorised';
+    catMap[cat] = (catMap[cat] || 0) + p.quantity * p.averageCost;
+  });
+  const cats = Object.keys(catMap).sort((a,b) => catMap[b]-catMap[a]);
+  const vals = cats.map(c => catMap[c]);
+  const total = vals.reduce((a,b) => a+b, 0);
+
+  const emptyEl = document.getElementById('chartCategoryEmpty');
+  const canvas  = document.getElementById('chartCategory');
+  const hasData = cats.length > 0 && total > 0;
+  emptyEl.style.display = hasData ? 'none' : 'block';
+  canvas.style.display  = hasData ? 'block' : 'none';
+  if (!hasData) return;
+
+  document.getElementById('pieTotal').textContent = 'Total: $' + total.toFixed(2);
+
+  const palette = ['#4361ee','#2ec4b6','#f77f00','#e63946','#9b5de5','#00b4d8','#f4a261','#52b788'];
+  const cfg = {
+    type: 'doughnut',
+    data: {
+      labels: cats,
+      datasets: [{ data: vals, backgroundColor: cats.map((_,i) => palette[i % palette.length]), borderWidth: 2, hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position:'right', labels:{ boxWidth:12, font:{size:11}, generateLabels: chart => {
+          return chart.data.labels.map((label,i) => ({
+            text: label + ' ($' + vals[i].toFixed(0) + ')',
+            fillStyle: palette[i % palette.length],
+            hidden: false, index: i
+          }));
+        }}},
+        tooltip: { callbacks: { label: ctx => ' $' + ctx.raw.toFixed(2) + ' (' + (ctx.raw/total*100).toFixed(1) + '%)' } }
+      }
+    }
+  };
+  if (_chartCategory) { _chartCategory.data = cfg.data; _chartCategory.update(); }
+  else { _chartCategory = new Chart(canvas.getContext('2d'), cfg); }
+}
+
+// ============================================================
+//  STOCK ADJUSTMENT
+// ============================================================
+function populateAdjSelect() {
+  const sel = document.getElementById('adjProduct');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Select product --</option>' +
+    appData.products.map(p => `<option value="${p.id}">${esc(p.sku)} - ${esc(p.name)} (${p.quantity} ${esc(p.unit)})</option>`).join('');
+  document.getElementById('adjustForm').reset();
+  document.getElementById('adjDiffRow').style.display = 'none';
+  document.getElementById('adjInfo').innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product</p></div>';
+}
+
+function updateAdjInfo() {
+  const id = parseInt(document.getElementById('adjProduct').value);
+  const p  = appData.products.find(x => x.id === id);
+  const el = document.getElementById('adjInfo');
+  if (!p) { el.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product</p></div>'; return; }
+  el.innerHTML = `
+    <div class="p-3 rounded mb-3" style="background:#f8f9fa;">
+      <div class="d-flex justify-content-between mb-2"><small class="text-muted">Product</small><strong>${esc(p.name)}</strong></div>
+      <div class="d-flex justify-content-between mb-2"><small class="text-muted">SKU</small><code>${esc(p.sku)}</code></div>
+      <div class="d-flex justify-content-between mb-2"><small class="text-muted">System qty</small><strong style="font-size:20px;">${p.quantity} ${esc(p.unit)}</strong></div>
+      <div class="d-flex justify-content-between mb-2"><small class="text-muted">Avg cost</small><strong>$${p.averageCost.toFixed(4)}</strong></div>
+      <div class="d-flex justify-content-between"><small class="text-muted">Stock value</small><strong>$${(p.quantity*p.averageCost).toFixed(2)}</strong></div>
+    </div>
+    <div class="p-3 rounded" style="background:#eef2ff;border:1px solid #c7d2fe;">
+      <small style="color:var(--primary);font-weight:600;">Enter the <em>actual</em> counted quantity above. The system will calculate the difference automatically.</small>
+    </div>`;
+  calcAdj();
+}
+
+function calcAdj() {
+  const id     = parseInt(document.getElementById('adjProduct').value);
+  const p      = appData.products.find(x => x.id === id);
+  const newQty = parseFloat(document.getElementById('adjNewQty').value);
+  const row    = document.getElementById('adjDiffRow');
+  const diffEl = document.getElementById('adjDiff');
+  if (!p || isNaN(newQty)) { row.style.display = 'none'; return; }
+  row.style.display = '';
+  const diff = newQty - p.quantity;
+  const sign = diff > 0 ? '+' : '';
+  const color = diff > 0 ? '#2e7d32' : diff < 0 ? 'var(--danger)' : 'var(--text-secondary)';
+  const icon  = diff > 0 ? 'bi-arrow-up-circle-fill' : diff < 0 ? 'bi-arrow-down-circle-fill' : 'bi-check-circle-fill';
+  diffEl.innerHTML = `<i class="bi ${icon} me-2" style="color:${color};"></i><span style="color:${color};">${sign}${diff} ${esc(p.unit)}</span><small class="text-muted ms-3">${p.quantity} → ${newQty}</small>`;
+}
+
+function renderAdjHistory() {
+  const tb = document.getElementById('adjHistory');
+  const adjusts = [...appData.transactions].reverse().filter(tx => tx.type === 'ADJUST').slice(0, 10);
+  if (!adjusts.length) { tb.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3 small">No adjustments yet</td></tr>'; return; }
+  tb.innerHTML = adjusts.map(tx => {
+    const p = appData.products.find(x => x.id === tx.productId);
+    const before = tx.stockAfter - tx.quantity;
+    const diff   = tx.quantity;
+    const sign   = diff >= 0 ? '+' : '';
+    const color  = diff > 0 ? '#2e7d32' : diff < 0 ? 'var(--danger)' : 'var(--text-secondary)';
+    return `<tr>
+      <td style="font-size:12px;">${tx.date}</td>
+      <td style="font-size:12px;">${p ? esc(p.name) : '?'}</td>
+      <td style="font-size:12px;">${before}</td>
+      <td style="font-size:12px;"><strong style="color:${color};">${tx.stockAfter}</strong> <small style="color:${color};">(${sign}${diff})</small></td>
+      <td style="font-size:12px;">${esc(tx.by||'-')}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function processAdjust(e) {
+  e.preventDefault();
+  const btn    = document.getElementById('btnAdj');
+  const id     = parseInt(document.getElementById('adjProduct').value);
+  const newQty = parseFloat(document.getElementById('adjNewQty').value);
+  const reason = document.getElementById('adjReason').value;
+  const notes  = document.getElementById('adjNotes').value.trim();
+  const p      = appData.products.find(x => x.id === id);
+  if (!p) return;
+
+  const diff = newQty - p.quantity;
+  const sign = diff >= 0 ? '+' : '';
+  if (!confirm(`Adjust "${p.name}" from ${p.quantity} → ${newQty} (${sign}${diff})?\n\nReason: ${reason}`)) return;
+
+  btn.classList.add('btn-loading'); btn.disabled = true;
+  try {
+    const r = await apiPost('stockAdjust', {
+      productId: id,
+      newQuantity: newQty,
+      reason,
+      notes: notes ? `[${reason}] ${notes}` : reason,
+      date: new Date().toISOString().split('T')[0]
+    });
+    if (r.success) {
+      showToast(r.message);
+      await loadAllData(); refreshAllViews();
+      populateAdjSelect(); renderAdjHistory();
+    } else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
+}
+
+// ============================================================
+//  WHATSAPP — SIMPLE MANUAL SEND
+// ============================================================
+function saveWaNumber() {
+  const num = document.getElementById('waSendNumber')?.value.trim() || '';
+  if (num) { localStorage.setItem('waNumber', num); showToast('Number saved'); }
+}
+function saveWaDefaultNumber() {
+  const num = document.getElementById('waDefaultNumber')?.value.trim() || '';
+  if (num) { localStorage.setItem('waNumber', num); showToast('Default number saved'); }
+  // sync to balance page input if visible
+  const inp = document.getElementById('waSendNumber');
+  if (inp) inp.value = num;
+}
+function loadWaDefaultNumber() {
+  const num = localStorage.getItem('waNumber') || '';
+  const el = document.getElementById('waDefaultNumber');
+  if (el) el.value = num;
+}
+function buildWaMessage() {
+  const P = appData.products;
+  const ls = P.filter(p => p.quantity <= p.minStock);
+  if (!ls.length) return null;
+  const lines = ls.map(p => `• ${p.name} — ${p.quantity} ${p.unit} (min: ${p.minStock})`).join('\n');
+  const date  = new Date().toLocaleDateString('en-MY', { day:'2-digit', month:'short', year:'numeric' });
+  return ` *InvenTrack Low Stock Alert*\n ${date}\n\nItems below minimum stock:\n\n${lines}\n\nPlease arrange restocking.`;
+}
+function updateWaPreview() {
+  const msg = buildWaMessage();
+  const el  = document.getElementById('waLowStockPreview');
+  if (!el) return;
+  if (!msg) { el.style.background='#f0fdf4'; el.style.color='#166534'; el.textContent='✅ All stock levels are healthy — no alert needed.'; return; }
+  el.textContent = msg;
+}
+function sendWhatsAppAlert() {
+  const num = (document.getElementById('waSendNumber')?.value || localStorage.getItem('waNumber') || '').trim();
+  if (!num) { showToast('Please enter a WhatsApp number first', 'warning'); return; }
+  const msg = buildWaMessage();
+  if (!msg) { showToast('No low stock items — nothing to send!', 'warning'); return; }
+  const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// ============================================================
+//  BALANCE STOCK
+// ============================================================
+let balanceRows = []; // [{productId, currentQty, balanceQty, notes}]
+
+function initBalancePage() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('balDate').value = today;
+
+  // Populate category filter
+  const cats = [...new Set(appData.products.map(p => p.category||'').filter(Boolean))].sort();
+  const catSel = document.getElementById('balCatFilter');
+  catSel.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+  renderBalanceTable();
+  renderBalHistory();
+  updateWaPreview();
+
+  // Load saved WA number
+  const savedNum = localStorage.getItem('waNumber') || '';
+  const inp = document.getElementById('waSendNumber');
+  if (inp && !inp.value) inp.value = savedNum;
+}
+
+function renderBalanceTable() {
+  const q      = (document.getElementById('balSearch')?.value || '').toLowerCase();
+  const cat    = document.getElementById('balCatFilter')?.value || '';
+  let   prods  = appData.products.filter(p => p.quantity >= 0); // all products
+  if (q)   prods = prods.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
+  if (cat) prods = prods.filter(p => (p.category||'') === cat);
+
+  const tbody = document.getElementById('balBody');
+  if (!prods.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-3">No products</td></tr>'; return; }
+
+  tbody.innerHTML = prods.map((p, i) => {
+    const rowId  = `bal-${p.id}`;
+    const catTag = p.category ? `<span style="font-size:10px;background:#eef2ff;color:var(--primary);padding:1px 6px;border-radius:8px;margin-left:4px;">${esc(p.category)}</span>` : '';
+    const lowWarn= p.quantity <= p.minStock ? `<i class="bi bi-exclamation-triangle-fill text-warning ms-1" title="Low stock"></i>` : '';
+    return `<tr id="row-${rowId}">
+      <td><div class="batch-row-num">${i+1}</div></td>
+      <td>
+        <div style="font-weight:600;font-size:13px;">${esc(p.name)}${catTag}${lowWarn}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${esc(p.sku)} <span style="color:#aaa;">· cost $${p.averageCost.toFixed(2)}</span></div>
+      </td>
+      <td style="text-align:center;font-weight:700;">${p.quantity} <small class="text-muted">${esc(p.unit)}</small></td>
+      <td><input type="number" class="form-control" id="${rowId}-bal" min="0" placeholder="0" style="text-align:center;" oninput="calcBalRow(${p.id})"></td>
+      <td><div style="position:relative;"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-secondary);font-size:13px;">$</span><input type="number" class="form-control" id="${rowId}-price" min="0" step="0.01" placeholder="0.00" style="padding-left:22px;" value="${p.sellingPrice > 0 ? p.sellingPrice : ''}" oninput="calcBalRow(${p.id})"></div></td>
+      <td style="text-align:center;"><span id="${rowId}-sold" style="font-weight:700;color:var(--text-secondary);">—</span></td>
+      <td style="text-align:right;"><span id="${rowId}-val" class="text-muted">—</span></td>
+      <td><input type="text" class="form-control" id="${rowId}-notes" placeholder="Notes..."></td>
+    </tr>`;
+  }).join('');
+
+  updateBalTotals();
+}
+
+function calcBalRow(productId) {
+  const p        = appData.products.find(x => x.id === productId);
+  if (!p) return;
+  const rowId    = `bal-${productId}`;
+  const balEl    = document.getElementById(`${rowId}-bal`);
+  const priceEl  = document.getElementById(`${rowId}-price`);
+  const soldEl   = document.getElementById(`${rowId}-sold`);
+  const valEl    = document.getElementById(`${rowId}-val`);
+  const balQty   = parseFloat(balEl?.value);
+  const sellPrice= parseFloat(priceEl?.value);
+
+  if (isNaN(balQty) || balEl.value === '') {
+    soldEl.textContent = '—';
+    soldEl.style.color = 'var(--text-secondary)';
+    valEl.textContent  = '—';
+    valEl.style.color  = 'var(--text-secondary)';
+    balEl.style.borderColor = '';
+  } else {
+    const sold  = p.quantity - balQty;
+    const color = sold > 0 ? '#2e7d32' : sold < 0 ? 'var(--danger)' : 'var(--text-secondary)';
+    soldEl.textContent = sold !== 0 ? (sold < 0 ? '+' : '') + sold : '0';
+    soldEl.style.color = color;
+    balEl.style.borderColor = balQty > p.quantity ? 'var(--danger)' : '';
+
+    if (sold > 0 && !isNaN(sellPrice) && sellPrice > 0) {
+      const salesVal = sold * sellPrice;
+      const margin   = sellPrice - p.averageCost;
+      const marginPct= p.averageCost > 0 ? (margin / p.averageCost * 100).toFixed(0) : '—';
+      valEl.innerHTML = `<span style="color:#2e7d32;font-weight:600;">$${salesVal.toFixed(2)}</span><br><small style="color:#888;font-size:10px;">margin ${marginPct}%</small>`;
+    } else if (sold > 0) {
+      valEl.innerHTML = `<span style="color:#aaa;font-size:11px;">enter price →</span>`;
+    } else {
+      valEl.textContent = sold === 0 ? '$0.00' : `(+${Math.abs(sold)})`;
+      valEl.style.color = color;
+    }
+  }
+  updateBalTotals();
+}
+
+function updateBalTotals() {
+  let totalSold = 0, totalVal = 0;
+  appData.products.forEach(p => {
+    const rowId    = `bal-${p.id}`;
+    const balEl    = document.getElementById(`${rowId}-bal`);
+    const priceEl  = document.getElementById(`${rowId}-price`);
+    if (!balEl || balEl.value === '') return;
+    const balQty   = parseFloat(balEl.value);
+    const sellPrice= parseFloat(priceEl?.value);
+    if (!isNaN(balQty)) {
+      const sold = p.quantity - balQty;
+      if (sold > 0) {
+        totalSold += sold;
+        // Use selling price if entered, otherwise fallback to avg cost
+        totalVal  += sold * (!isNaN(sellPrice) && sellPrice > 0 ? sellPrice : p.averageCost);
+      }
+    }
+  });
+  document.getElementById('balTotalSold').textContent = totalSold;
+  document.getElementById('balTotalVal').textContent  = '$' + totalVal.toFixed(2);
+
+  // Update summary banner
+  const filled = appData.products.filter(p => {
+    const el = document.getElementById(`bal-${p.id}-bal`);
+    return el && el.value !== '';
+  }).length;
+  document.getElementById('balSumProducts').textContent = filled;
+  document.getElementById('balSumSoldQty').textContent  = totalSold;
+  document.getElementById('balSumSalesVal').textContent = '$' + totalVal.toFixed(2);
+  if (filled > 0) document.getElementById('balSummaryBanner').style.display = 'flex';
+}
+
+function balFillAllCurrent() {
+  // Pre-fill all balance inputs with current stock (assumes 0 sold)
+  appData.products.forEach(p => {
+    const el = document.getElementById(`bal-${p.id}-bal`);
+    if (el) { el.value = p.quantity; calcBalRow(p.id); }
+  });
+}
+
+function fillBalanceToday() {
+  // Clear all inputs
+  appData.products.forEach(p => {
+    const el = document.getElementById(`bal-${p.id}-bal`);
+    if (el) el.value = '';
+    calcBalRow(p.id);
+  });
+  document.getElementById('balSummaryBanner').style.display = 'none';
+  document.getElementById('balResultLog').style.display = 'none';
+  document.getElementById('balSearch').value = '';
+  document.getElementById('balCatFilter').value = '';
+  renderBalanceTable();
+}
+
+async function submitBalance() {
+  const date  = document.getElementById('balDate').value || new Date().toISOString().split('T')[0];
+  const items = [];
+  let hasError = false;
+
+  appData.products.forEach(p => {
+    const rowId    = `bal-${p.id}`;
+    const balEl    = document.getElementById(`${rowId}-bal`);
+    const priceEl  = document.getElementById(`${rowId}-price`);
+    const notes    = document.getElementById(`${rowId}-notes`)?.value.trim() || '';
+    if (!balEl || balEl.value === '') return;
+    const balQty   = parseFloat(balEl.value);
+    const sellPrice= parseFloat(priceEl?.value);
+    if (isNaN(balQty) || balQty < 0) return;
+    if (balQty > p.quantity) {
+      showToast(`"${p.name}": balance (${balQty}) cannot exceed current stock (${p.quantity})`, 'error');
+      hasError = true; return;
+    }
+    const sold = p.quantity - balQty;
+    // Require selling price if there are actual sales
+    if (sold > 0 && (isNaN(sellPrice) || sellPrice <= 0)) {
+      showToast(`"${p.name}": please enter a selling price (${sold} units sold)`, 'error');
+      hasError = true; return;
+    }
+    items.push({ productId: p.id, balanceQty: balQty, soldQty: sold, sellingPrice: sellPrice || 0, notes, date });
+  });
+
+  if (hasError) return;
+  if (!items.length) { showToast('No balance entries to submit', 'warning'); return; }
+
+  const soldItems = items.filter(i => i.soldQty > 0);
+  const noChange  = items.filter(i => i.soldQty === 0);
+  if (!confirm(`Submit closing balance for ${items.length} products?\n${soldItems.length} with sales (${soldItems.reduce((s,i)=>s+i.soldQty,0)} units total)\n${noChange.length} with no change`)) return;
+
+  const btn = document.getElementById('btnBalSubmit');
+  btn.disabled = true;
+  const log     = document.getElementById('balResultLog');
+  const logItems= document.getElementById('balResultItems');
+  log.style.display  = 'block';
+  logItems.innerHTML = '';
+
+  let ok = 0, fail = 0, done = 0;
+  for (const item of items) {
+    const p     = appData.products.find(x => x.id === item.productId);
+    const label = p ? p.name : 'ID ' + item.productId;
+    try {
+      const r = await apiPost('stockBalance', item);
+      if (r.success) {
+        ok++;
+        const msg = item.soldQty > 0
+          ? `<strong>${esc(label)}</strong> — ${p.quantity}→${item.balanceQty}, sold ${item.soldQty} ${esc(p?.unit||'')}`
+          : `<strong>${esc(label)}</strong> — no change (${item.balanceQty} ${esc(p?.unit||'')})`;
+        logItems.innerHTML += `<div class="batch-result-ok mb-1"><i class="bi bi-check-circle me-1"></i>${msg}</div>`;
+      } else {
+        fail++;
+        logItems.innerHTML += `<div class="batch-result-err mb-1"><i class="bi bi-x-circle me-1"></i><strong>${esc(label)}</strong> — ${esc(r.error)}</div>`;
+      }
+    } catch(ex) {
+      fail++;
+      logItems.innerHTML += `<div class="batch-result-err mb-1"><i class="bi bi-x-circle me-1"></i><strong>${esc(label)}</strong> — ${esc(ex.message)}</div>`;
+    }
+    done++;
+  }
+
+  await loadAllData(); refreshAllViews();
+  renderBalHistory();
+  updateWaPreview();
+  btn.disabled = false;
+  showToast(`Balance submitted: ${ok} OK${fail ? ', '+fail+' failed' : ''}`, fail ? 'warning' : 'success');
+}
+
+function renderBalHistory() {
+  const today = new Date().toISOString().split('T')[0];
+  const tb    = document.getElementById('balHistoryBody');
+  if (!tb) return;
+  const todayBal = [...appData.transactions].reverse().filter(tx => tx.type === 'BALANCE' && tx.date === today);
+  if (!todayBal.length) { tb.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3 small">No entries today</td></tr>'; return; }
+  tb.innerHTML = todayBal.map(tx => {
+    const p    = appData.products.find(x => x.id === tx.productId);
+    const sold = Math.abs(tx.quantity);
+    return `<tr>
+      <td style="font-size:11px;">${p ? esc(p.name) : '?'}</td>
+      <td style="font-size:11px;">${tx.stockAfter}</td>
+      <td style="font-size:11px;font-weight:600;color:${sold>0?'#2e7d32':'var(--text-secondary)'};">${sold>0?sold:'—'}</td>
+      <td style="font-size:11px;">${esc(tx.by||'-')}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ============================================================
 //  PRODUCTS
 // ============================================================
+function refreshCategoryFilter() {
+  const sel = document.getElementById('productCatFilter');
+  if (!sel) return;
+  const current = sel.value;
+  const cats = [...new Set(appData.products.map(p => p.category||'').filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All categories</option>' +
+    cats.map(c => `<option value="${esc(c)}" ${c===current?'selected':''}>${esc(c)}</option>`).join('');
+}
+
+function clearProductFilter() {
+  document.getElementById('productSearch').value = '';
+  document.getElementById('productCatFilter').value = '';
+  renderProducts();
+}
+
 function renderProducts() {
-  const q=(document.getElementById('productSearch').value||'').toLowerCase();
-  let P=appData.products;
-  if(q) P=P.filter(p=>p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q));
+  const q   = (document.getElementById('productSearch').value||'').toLowerCase();
+  const cat = document.getElementById('productCatFilter')?.value || '';
+  let P = appData.products;
+  if (q)   P = P.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q));
+  if (cat) P = P.filter(p => (p.category||'') === cat);
+
+  const clearBtn = document.getElementById('clearProdFilter');
+  if (clearBtn) clearBtn.style.display = (q || cat) ? '' : 'none';
+
   const isAdmin = SESSION && SESSION.user.role==='admin';
-  const tb=document.getElementById('productsTableBody');
-  if(!P.length){tb.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="bi bi-box-seam"></i><h5>No Products</h5></div></td></tr>';return;}
-  tb.innerHTML=P.map(p=>{const v=p.quantity*p.averageCost;const low=p.quantity<=p.minStock;return`<tr>
-    <td><code>${esc(p.sku)}</code></td><td><strong>${esc(p.name)}</strong></td><td>${esc(p.category||'-')}</td>
-    <td><strong>${p.quantity}</strong> <small class="text-muted">${esc(p.unit)}</small></td>
-    <td>$${p.averageCost.toFixed(4)}</td><td><strong>$${v.toFixed(2)}</strong></td>
-    <td>${low?'<span class="badge-low">Low</span>':'<span class="badge-ok">OK</span>'}</td>
-    <td class="admin-only">${isAdmin?`<div style="display:flex;gap:4px;">
-      <button class="btn-icon success" onclick="openProductModal(${p.id})"><i class="bi bi-pencil-fill" style="font-size:13px;"></i></button>
-      <button class="btn-icon danger" onclick="deleteProduct(${p.id})"><i class="bi bi-trash-fill" style="font-size:13px;"></i></button></div>`:''}</td></tr>`;}).join('');
+  const tb = document.getElementById('productsTableBody');
+  if (!P.length) {
+    tb.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="bi bi-box-seam"></i><h5>${q||cat ? 'No products match' : 'No Products'}</h5>${q||cat?`<p class="text-muted small">Try a different search or category</p>`:''}</div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = P.map(p => {
+    const v          = p.quantity * p.averageCost;
+    const low        = p.quantity <= p.minStock;
+    const sp         = p.sellingPrice || 0;
+    const margin     = sp > 0 && p.averageCost > 0 ? ((sp - p.averageCost) / p.averageCost * 100) : null;
+    const marginStr  = margin !== null
+      ? `<span style="color:${margin>=0?'#2e7d32':'var(--danger)'};font-size:12px;font-weight:600;">${margin>=0?'+':''}${margin.toFixed(1)}%</span>`
+      : '<span class="text-muted">—</span>';
+    const spStr      = sp > 0
+      ? `<span style="font-weight:600;color:#2e7d32;">$${sp.toFixed(2)}</span>`
+      : `<span class="text-muted" style="font-size:11px;">not set</span>`;
+    const catBadge   = p.category
+      ? `<span style="background:#eef2ff;color:var(--primary);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;" onclick="setCatFilter('${esc(p.category)}')">${esc(p.category)}</span>`
+      : '<span class="text-muted">-</span>';
+    return `<tr>
+      <td><code>${esc(p.sku)}</code></td>
+      <td><strong>${esc(p.name)}</strong></td>
+      <td>${catBadge}</td>
+      <td><strong>${p.quantity}</strong> <small class="text-muted">${esc(p.unit)}</small></td>
+      <td style="font-size:12px;">$${p.averageCost.toFixed(2)}</td>
+      <td>${spStr}</td>
+      <td>${marginStr}</td>
+      <td><strong>$${v.toFixed(2)}</strong></td>
+      <td>${low ? '<span class="badge-low">Low</span>' : '<span class="badge-ok">OK</span>'}</td>
+      <td class="admin-only">${isAdmin ? `<div style="display:flex;gap:4px;">
+        <button class="btn-icon success" onclick="openProductModal(${p.id})" title="Edit"><i class="bi bi-pencil-fill" style="font-size:13px;"></i></button>
+        <button class="btn-icon danger" onclick="deleteProduct(${p.id})" title="Delete"><i class="bi bi-trash-fill" style="font-size:13px;"></i></button>
+      </div>` : ''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setCatFilter(cat) {
+  const sel = document.getElementById('productCatFilter');
+  if (sel) { sel.value = cat; renderProducts(); }
 }
 
 function openProductModal(editId) {
   document.getElementById('productForm').reset();
-  document.getElementById('pEditId').value='';
-  document.getElementById('pUnit').value='pcs';document.getElementById('pMin').value='10';
-  if(editId){const p=appData.products.find(x=>x.id===editId);if(!p)return;
-    document.getElementById('pmTitle').textContent='Edit Product';
-    document.getElementById('pEditId').value=p.id;document.getElementById('pSku').value=p.sku;
-    document.getElementById('pName').value=p.name;document.getElementById('pCat').value=p.category||'';
-    document.getElementById('pUnit').value=p.unit||'pcs';document.getElementById('pMin').value=p.minStock||10;
-  } else document.getElementById('pmTitle').textContent='Add Product';
+  document.getElementById('pEditId').value = '';
+  document.getElementById('pUnit').value = 'pcs';
+  document.getElementById('pMin').value = '10';
+  document.getElementById('pSellingPrice').value = '';
+  document.getElementById('pPriceHistory').style.display = 'none';
+
+  if (editId) {
+    const p = appData.products.find(x => x.id === editId);
+    if (!p) return;
+    document.getElementById('pmTitle').textContent = 'Edit Product';
+    document.getElementById('pEditId').value   = p.id;
+    document.getElementById('pSku').value      = p.sku;
+    document.getElementById('pName').value     = p.name;
+    document.getElementById('pCat').value      = p.category || '';
+    document.getElementById('pUnit').value     = p.unit || 'pcs';
+    document.getElementById('pMin').value      = p.minStock || 10;
+    document.getElementById('pSellingPrice').value = p.sellingPrice > 0 ? p.sellingPrice : '';
+
+    // Show price history from BALANCE transactions for this product
+    renderPriceHistory(p.id);
+  } else {
+    document.getElementById('pmTitle').textContent = 'Add Product';
+  }
   new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
+function renderPriceHistory(productId) {
+  const panel = document.getElementById('pPriceHistory');
+  const list  = document.getElementById('pPriceHistoryList');
+  const hist  = (appData.priceHistory || []).filter(h => h.productId === productId).reverse();
+
+  if (!hist.length) {
+    // Fallback: derive from BALANCE transactions if no explicit price history yet
+    const balTx = appData.transactions
+      .filter(tx => tx.type === 'BALANCE' && tx.productId === productId && tx.unitCost > 0)
+      .reverse();
+    if (!balTx.length) { panel.style.display = 'none'; return; }
+    const seen = new Set();
+    const rows = [];
+    for (const tx of balTx) {
+      const key = tx.date + '_' + tx.unitCost;
+      if (!seen.has(key)) {
+        seen.add(key);
+        rows.push({ date: tx.date, newPrice: tx.unitCost, oldPrice: 0, changedBy: tx.by, sold: Math.abs(tx.quantity) });
+      }
+    }
+    list.innerHTML = rows.map((r, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;${i<rows.length-1?'border-bottom:1px solid #e8e8e8;':''}">
+        <div>
+          <span style="color:var(--text-secondary);">${r.date}</span>
+          <small style="color:#aaa;margin-left:6px;">by ${esc(r.changedBy)}</small>
+          <small style="color:#aaa;margin-left:4px;">(${r.sold} sold)</small>
+        </div>
+        <div style="text-align:right;">
+          <strong style="color:#2e7d32;">$${Number(r.newPrice).toFixed(2)}</strong>
+          <button class="btn btn-link btn-sm p-0 ms-2" style="font-size:11px;" onclick="document.getElementById('pSellingPrice').value='${r.newPrice}'">Use</button>
+        </div>
+      </div>`).join('');
+    panel.style.display = 'block';
+    return;
+  }
+
+  list.innerHTML = hist.map((h, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;${i<hist.length-1?'border-bottom:1px solid #e8e8e8;':''}">
+      <div>
+        <span style="color:var(--text-secondary);">${h.timestamp.slice(0,10)}</span>
+        <small style="color:#aaa;margin-left:6px;">by ${esc(h.changedBy)}</small>
+      </div>
+      <div style="text-align:right;">
+        ${h.oldPrice > 0 ? `<span style="color:#aaa;text-decoration:line-through;font-size:11px;margin-right:4px;">$${Number(h.oldPrice).toFixed(2)}</span>→ ` : ''}
+        <strong style="color:#2e7d32;">$${Number(h.newPrice).toFixed(2)}</strong>
+        <button class="btn btn-link btn-sm p-0 ms-2" style="font-size:11px;" onclick="document.getElementById('pSellingPrice').value='${h.newPrice}'">Use</button>
+      </div>
+    </div>`).join('');
+  panel.style.display = 'block';
+}
+
 async function saveProduct(e) {
-  e.preventDefault();const btn=document.getElementById('btnSaveP');btn.classList.add('btn-loading');btn.disabled=true;
-  try{const editId=document.getElementById('pEditId').value;
-    const d={sku:document.getElementById('pSku').value.trim(),name:document.getElementById('pName').value.trim(),category:document.getElementById('pCat').value.trim(),unit:document.getElementById('pUnit').value.trim()||'pcs',minStock:parseInt(document.getElementById('pMin').value)||10};
-    let r;if(editId){d.id=parseInt(editId);r=await apiPost('updateProduct',d);}else{r=await apiPost('addProduct',d);}
-    if(r.success){showToast(r.message);bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();await loadAllData();refreshAllViews();}
-    else showToast(r.error,'error');
-  }catch(ex){showToast(ex.message,'error');}finally{btn.classList.remove('btn-loading');btn.disabled=false;}
+  e.preventDefault();
+  const btn = document.getElementById('btnSaveP');
+  btn.classList.add('btn-loading'); btn.disabled = true;
+  try {
+    const editId = document.getElementById('pEditId').value;
+    const sp     = parseFloat(document.getElementById('pSellingPrice').value) || 0;
+    const d = {
+      sku:          document.getElementById('pSku').value.trim(),
+      name:         document.getElementById('pName').value.trim(),
+      category:     document.getElementById('pCat').value.trim(),
+      unit:         document.getElementById('pUnit').value.trim() || 'pcs',
+      minStock:     parseInt(document.getElementById('pMin').value) || 10,
+      sellingPrice: sp,
+      changedBy:    SESSION?.user?.displayName || SESSION?.user?.username || ''
+    };
+    console.log('[InvenTrack] saveProduct payload:', JSON.stringify(d));
+    let r;
+    if (editId) { d.id = parseInt(editId); r = await apiPost('updateProduct', d); }
+    else { r = await apiPost('addProduct', d); }
+    console.log('[InvenTrack] saveProduct response:', JSON.stringify(r));
+    if (r.success) {
+      showToast(r.message);
+      bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+      await loadAllData(); refreshAllViews();
+    } else showToast(r.error, 'error');
+  } catch(ex) { showToast(ex.message, 'error'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
 }
 
 async function deleteProduct(id) {
@@ -752,8 +1802,328 @@ function populateSelects() {
   const td=new Date().toISOString().split('T')[0];
   document.getElementById('siDate').value=td;document.getElementById('soDate').value=td;
   resetPanel('siInfo');resetPanel('soInfo');
+  // Refresh batch dropdowns with latest stock quantities
+  document.querySelectorAll('#bsiBody tr').forEach(tr=>{
+    const rid=tr.id.replace('bsi-row-','');
+    const sel=document.getElementById('bsi-prod-'+rid);
+    if(sel){const cur=sel.value;sel.innerHTML=buildProductOptions(parseInt(cur)||0);calcBSIRow(rid);}
+  });
+  document.querySelectorAll('#bsoBody tr').forEach(tr=>{
+    const rid=tr.id.replace('bso-row-','');
+    const sel=document.getElementById('bso-prod-'+rid);
+    if(sel){const cur=sel.value;sel.innerHTML=buildProductOptions(parseInt(cur)||0);calcBSORow(rid);}
+  });
 }
 function resetPanel(id){document.getElementById(id).innerHTML='<div class="text-center text-muted py-4"><i class="bi bi-info-circle" style="font-size:40px;opacity:.3;"></i><p class="mt-2">Select a product</p></div>';}
+
+// ============================================================
+//  BATCH MODE TOGGLE
+// ============================================================
+function setSIMode(mode) {
+  const single = document.getElementById('siSingleMode');
+  const batch  = document.getElementById('siBatchMode');
+  const hint   = document.getElementById('siModeHint');
+  document.getElementById('siModeBtn-single').classList.toggle('active', mode==='single');
+  document.getElementById('siModeBtn-batch').classList.toggle('active', mode==='batch');
+  single.style.display = mode==='single' ? '' : 'none';
+  batch.style.display  = mode==='batch'  ? '' : 'none';
+  hint.textContent = mode==='single' ? 'Enter one product at a time' : 'Add multiple products and submit at once';
+  if (mode==='batch' && document.getElementById('bsiBody').children.length===0) {
+    const td = new Date().toISOString().split('T')[0];
+    document.getElementById('bsiDate').value = td;
+    addBSIRow(); addBSIRow(); addBSIRow();
+  }
+}
+
+function setSOMode(mode) {
+  const single = document.getElementById('soSingleMode');
+  const batch  = document.getElementById('soBatchMode');
+  const hint   = document.getElementById('soModeHint');
+  document.getElementById('soModeBtn-single').classList.toggle('active', mode==='single');
+  document.getElementById('soModeBtn-batch').classList.toggle('active', mode==='batch');
+  single.style.display = mode==='single' ? '' : 'none';
+  batch.style.display  = mode==='batch'  ? '' : 'none';
+  hint.textContent = mode==='single' ? 'Enter one product at a time' : 'Add multiple products and submit at once';
+  if (mode==='batch' && document.getElementById('bsoBody').children.length===0) {
+    const td = new Date().toISOString().split('T')[0];
+    document.getElementById('bsoDate').value = td;
+    addBSORow(); addBSORow(); addBSORow();
+  }
+}
+
+// ============================================================
+//  BATCH STOCK IN
+// ============================================================
+let bsiRowId = 0;
+
+function buildProductOptions(selectedId) {
+  return '<option value="">-- Select --</option>' +
+    appData.products.map(p =>
+      `<option value="${p.id}" ${p.id===selectedId?'selected':''}>
+        ${esc(p.sku)} - ${esc(p.name)} (${p.quantity} ${esc(p.unit)})
+      </option>`
+    ).join('');
+}
+
+function addBSIRow(productId) {
+  const id = ++bsiRowId;
+  const tbody = document.getElementById('bsiBody');
+  const num = tbody.children.length + 1;
+  const tr = document.createElement('tr');
+  tr.id = 'bsi-row-' + id;
+  tr.innerHTML = `
+    <td><div class="batch-row-num">${num}</div></td>
+    <td><select class="form-select" id="bsi-prod-${id}" onchange="calcBSIRow(${id})">${buildProductOptions(productId)}</select></td>
+    <td><input type="number" class="form-control" id="bsi-qty-${id}" min="1" placeholder="0" oninput="calcBSIRow(${id})"></td>
+    <td><input type="number" class="form-control" id="bsi-cost-${id}" min="0" step="0.01" placeholder="0.00" oninput="calcBSIRow(${id})"></td>
+    <td><span id="bsi-total-${id}" class="fw-bold text-muted">-</span></td>
+    <td><input type="text" class="form-control" id="bsi-notes-${id}" placeholder="Optional"></td>
+    <td><button class="btn-icon-sm" onclick="removeBSIRow(${id})"><i class="bi bi-x-lg"></i></button></td>`;
+  tbody.appendChild(tr);
+  renumberBSIRows();
+  updateBSISummary();
+}
+
+function removeBSIRow(id) {
+  const el = document.getElementById('bsi-row-' + id);
+  if (el) el.remove();
+  renumberBSIRows();
+  updateBSISummary();
+}
+
+function renumberBSIRows() {
+  document.querySelectorAll('#bsiBody tr').forEach((tr, i) => {
+    const num = tr.querySelector('.batch-row-num');
+    if (num) num.textContent = i + 1;
+  });
+}
+
+function calcBSIRow(id) {
+  const qty  = parseFloat(document.getElementById('bsi-qty-'+id)?.value) || 0;
+  const cost = parseFloat(document.getElementById('bsi-cost-'+id)?.value) || 0;
+  const tot  = document.getElementById('bsi-total-'+id);
+  if (tot) tot.textContent = qty > 0 && cost > 0 ? '$' + (qty * cost).toFixed(2) : '-';
+  updateBSISummary();
+}
+
+function updateBSISummary() {
+  const rows = document.querySelectorAll('#bsiBody tr');
+  let totalQty = 0, totalVal = 0, validRows = 0;
+  rows.forEach(tr => {
+    const rid = tr.id.replace('bsi-row-', '');
+    const qty  = parseFloat(document.getElementById('bsi-qty-'+rid)?.value) || 0;
+    const cost = parseFloat(document.getElementById('bsi-cost-'+rid)?.value) || 0;
+    const prod = document.getElementById('bsi-prod-'+rid)?.value;
+    if (prod && qty > 0) { validRows++; totalQty += qty; totalVal += qty * cost; }
+  });
+  document.getElementById('bsiSumRows').textContent = validRows;
+  document.getElementById('bsiSumQty').textContent  = totalQty;
+  document.getElementById('bsiSumVal').textContent  = '$' + totalVal.toFixed(2);
+  document.getElementById('bsiTotalQty').textContent = totalQty || 0;
+  document.getElementById('bsiTotalVal').textContent = '$' + totalVal.toFixed(2);
+}
+
+async function processBatchStockIn() {
+  const date  = document.getElementById('bsiDate').value || new Date().toISOString().split('T')[0];
+  const rows  = document.querySelectorAll('#bsiBody tr');
+  const items = [];
+
+  rows.forEach(tr => {
+    const rid   = tr.id.replace('bsi-row-', '');
+    const prod  = parseInt(document.getElementById('bsi-prod-'+rid)?.value);
+    const qty   = parseFloat(document.getElementById('bsi-qty-'+rid)?.value);
+    const cost  = parseFloat(document.getElementById('bsi-cost-'+rid)?.value);
+    const notes = document.getElementById('bsi-notes-'+rid)?.value.trim() || '';
+    if (prod && qty > 0 && cost >= 0) items.push({ productId: prod, quantity: qty, unitCost: cost, notes, date, _rid: rid });
+  });
+
+  if (!items.length) { showToast('Add at least one valid row', 'warning'); return; }
+  if (!confirm(`Submit ${items.length} Stock In entries?`)) return;
+
+  const btn = document.getElementById('btnBSI');
+  btn.disabled = true;
+
+  const prog    = document.getElementById('bsiProgress');
+  const progBar = document.getElementById('bsiProgressBar');
+  const log     = document.getElementById('bsiResultLog');
+  const logItems = document.getElementById('bsiResultItems');
+
+  prog.style.display = 'block';
+  log.style.display  = 'block';
+  logItems.innerHTML = '';
+
+  let done = 0, ok = 0, fail = 0;
+
+  for (const item of items) {
+    const p = appData.products.find(x => x.id === item.productId);
+    const label = p ? p.name : 'ID ' + item.productId;
+    try {
+      const r = await apiPost('stockIn', item);
+      if (r.success) {
+        ok++;
+        logItems.innerHTML += `<div class="batch-result-ok mb-1"><i class="bi bi-check-circle me-1"></i><strong>${esc(label)}</strong> +${item.quantity} @ $${item.unitCost.toFixed(2)} — OK</div>`;
+      } else {
+        fail++;
+        logItems.innerHTML += `<div class="batch-result-err mb-1"><i class="bi bi-x-circle me-1"></i><strong>${esc(label)}</strong> — ${esc(r.error)}</div>`;
+      }
+    } catch(ex) {
+      fail++;
+      logItems.innerHTML += `<div class="batch-result-err mb-1"><i class="bi bi-x-circle me-1"></i><strong>${esc(label)}</strong> — ${esc(ex.message)}</div>`;
+    }
+    done++;
+    progBar.style.width = Math.round(done / items.length * 100) + '%';
+  }
+
+  await loadAllData(); refreshAllViews();
+  btn.disabled = false;
+
+  const msg = `Batch done: ${ok} success${fail > 0 ? ', ' + fail + ' failed' : ''}`;
+  showToast(msg, fail > 0 ? 'warning' : 'success');
+}
+
+// ============================================================
+//  BATCH STOCK OUT
+// ============================================================
+let bsoRowId = 0;
+
+function addBSORow(productId) {
+  const id = ++bsoRowId;
+  const tbody = document.getElementById('bsoBody');
+  const num = tbody.children.length + 1;
+  const tr = document.createElement('tr');
+  tr.id = 'bso-row-' + id;
+  tr.innerHTML = `
+    <td><div class="batch-row-num">${num}</div></td>
+    <td><select class="form-select" id="bso-prod-${id}" onchange="calcBSORow(${id})">${buildProductOptions(productId)}</select></td>
+    <td>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <input type="number" class="form-control" id="bso-qty-${id}" min="1" placeholder="0" oninput="calcBSORow(${id})">
+        <span id="bso-avail-${id}" class="text-muted" style="font-size:11px;white-space:nowrap;"></span>
+      </div>
+    </td>
+    <td><span id="bso-total-${id}" class="fw-bold text-muted">-</span></td>
+    <td><input type="text" class="form-control" id="bso-notes-${id}" placeholder="e.g. Sold..."></td>
+    <td><button class="btn-icon-sm" onclick="removeBSORow(${id})"><i class="bi bi-x-lg"></i></button></td>`;
+  tbody.appendChild(tr);
+  renumberBSORows();
+  updateBSOSummary();
+}
+
+function removeBSORow(id) {
+  const el = document.getElementById('bso-row-' + id);
+  if (el) el.remove();
+  renumberBSORows();
+  updateBSOSummary();
+}
+
+function renumberBSORows() {
+  document.querySelectorAll('#bsoBody tr').forEach((tr, i) => {
+    const num = tr.querySelector('.batch-row-num');
+    if (num) num.textContent = i + 1;
+  });
+}
+
+function calcBSORow(id) {
+  const prodEl = document.getElementById('bso-prod-'+id);
+  const qtyEl  = document.getElementById('bso-qty-'+id);
+  const totEl  = document.getElementById('bso-total-'+id);
+  const availEl= document.getElementById('bso-avail-'+id);
+  if (!prodEl) return;
+  const prodId = parseInt(prodEl.value);
+  const p = appData.products.find(x => x.id === prodId);
+  const qty = parseFloat(qtyEl?.value) || 0;
+  if (p) {
+    availEl.textContent = '/ ' + p.quantity;
+    if (qty > p.quantity) qtyEl.style.borderColor = 'var(--danger)';
+    else qtyEl.style.borderColor = '';
+    totEl.textContent = qty > 0 ? '$' + (qty * p.averageCost).toFixed(2) : '-';
+  } else {
+    availEl.textContent = '';
+    totEl.textContent = '-';
+    qtyEl.style.borderColor = '';
+  }
+  updateBSOSummary();
+}
+
+function updateBSOSummary() {
+  const rows = document.querySelectorAll('#bsoBody tr');
+  let totalQty = 0, totalVal = 0, validRows = 0;
+  rows.forEach(tr => {
+    const rid = tr.id.replace('bso-row-', '');
+    const qty  = parseFloat(document.getElementById('bso-qty-'+rid)?.value) || 0;
+    const prod = parseInt(document.getElementById('bso-prod-'+rid)?.value);
+    const p = appData.products.find(x => x.id === prod);
+    if (p && qty > 0) { validRows++; totalQty += qty; totalVal += qty * p.averageCost; }
+  });
+  document.getElementById('bsoSumRows').textContent = validRows;
+  document.getElementById('bsoSumQty').textContent  = totalQty;
+  document.getElementById('bsoSumVal').textContent  = '$' + totalVal.toFixed(2);
+  document.getElementById('bsoTotalQty').textContent = totalQty || 0;
+  document.getElementById('bsoTotalVal').textContent = '$' + totalVal.toFixed(2);
+}
+
+async function processBatchStockOut() {
+  const date  = document.getElementById('bsoDate').value || new Date().toISOString().split('T')[0];
+  const rows  = document.querySelectorAll('#bsoBody tr');
+  const items = [];
+  let hasError = false;
+
+  rows.forEach(tr => {
+    const rid   = tr.id.replace('bso-row-', '');
+    const prod  = parseInt(document.getElementById('bso-prod-'+rid)?.value);
+    const qty   = parseFloat(document.getElementById('bso-qty-'+rid)?.value);
+    const notes = document.getElementById('bso-notes-'+rid)?.value.trim() || '';
+    const p = appData.products.find(x => x.id === prod);
+    if (prod && qty > 0) {
+      if (p && qty > p.quantity) { showToast(`"${p.name}": qty ${qty} exceeds stock ${p.quantity}`, 'error'); hasError = true; }
+      else items.push({ productId: prod, quantity: qty, notes, date, _rid: rid });
+    }
+  });
+
+  if (hasError) return;
+  if (!items.length) { showToast('Add at least one valid row', 'warning'); return; }
+  if (!confirm(`Submit ${items.length} Stock Out entries?`)) return;
+
+  const btn = document.getElementById('btnBSO');
+  btn.disabled = true;
+
+  const prog    = document.getElementById('bsoProgress');
+  const progBar = document.getElementById('bsoProgressBar');
+  const log     = document.getElementById('bsoResultLog');
+  const logItems = document.getElementById('bsoResultItems');
+
+  prog.style.display = 'block';
+  log.style.display  = 'block';
+  logItems.innerHTML = '';
+
+  let done = 0, ok = 0, fail = 0;
+
+  for (const item of items) {
+    const p = appData.products.find(x => x.id === item.productId);
+    const label = p ? p.name : 'ID ' + item.productId;
+    try {
+      const r = await apiPost('stockOut', item);
+      if (r.success) {
+        ok++;
+        logItems.innerHTML += `<div class="batch-result-ok mb-1"><i class="bi bi-check-circle me-1"></i><strong>${esc(label)}</strong> -${item.quantity} — OK</div>`;
+      } else {
+        fail++;
+        logItems.innerHTML += `<div class="batch-result-err mb-1"><i class="bi bi-x-circle me-1"></i><strong>${esc(label)}</strong> — ${esc(r.error)}</div>`;
+      }
+    } catch(ex) {
+      fail++;
+      logItems.innerHTML += `<div class="batch-result-err mb-1"><i class="bi bi-x-circle me-1"></i><strong>${esc(label)}</strong> — ${esc(ex.message)}</div>`;
+    }
+    done++;
+    progBar.style.width = Math.round(done / items.length * 100) + '%';
+  }
+
+  await loadAllData(); refreshAllViews();
+  btn.disabled = false;
+
+  const msg = `Batch done: ${ok} success${fail > 0 ? ', ' + fail + ' failed' : ''}`;
+  showToast(msg, fail > 0 ? 'warning' : 'success');
+}
 
 // ============================================================
 //  STOCK IN
